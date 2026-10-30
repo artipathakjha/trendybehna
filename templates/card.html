@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<title>Trendy Behna deal card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@500;600&family=Tiro+Devanagari+Hindi&display=block" rel="stylesheet">
+<style>
+  /* Rendered at {{W}}x{{H}}: 1080x1350 (feed: Telegram, Facebook) or 1080x1920 (Instagram Story).
+     Story: Instagram UI covers about the top 250px and bottom 300px, so .story pads those. */
+  :root { --rani:#B0145A; --deep:#6E0A37; --gold:#D4A24C; --gold-hi:#F0CF7E; --cream:#FFF6EC; --blush:#FBE4EA; }
+  html, body { margin:0; width:{{W}}px; height:{{H}}px; overflow:hidden; background:var(--deep); }
+  .c { box-sizing:border-box; width:{{W}}px; height:{{H}}px; display:flex; flex-direction:column; align-items:center;
+       justify-content:center; gap:34px; padding:80px 70px; text-align:center;
+       background:radial-gradient(ellipse 85% 60% at 50% 40%, #C8306F 0%, #B0145A 42%, #8A0E47 75%, #6E0A37 100%); }
+  .story { padding:280px 70px 330px; }
+  .brand { font-family:'Tiro Devanagari Hindi', serif; font-size:40px; color:var(--gold-hi); }
+  .name  { font-family:'Playfair Display', serif; font-weight:700; font-size:64px; color:var(--cream); margin-top:-24px; }
+  .chip  { font-family:'Poppins', sans-serif; font-weight:600; font-size:30px; letter-spacing:4px; color:var(--deep);
+           background:var(--gold-hi); padding:12px 34px; border-radius:40px; text-transform:uppercase; }
+  .title { font-family:'Playfair Display', serif; font-weight:700; font-size:{{TITLE_PX}}px; line-height:1.15;
+           color:var(--cream); text-shadow:0 5px 22px rgba(60,0,25,.45); }
+  .facts { font-family:'Poppins', sans-serif; font-weight:500; font-size:40px; line-height:1.5; color:var(--blush); }
+  .facts b { color:var(--gold-hi); font-weight:600; }
+  .store { font-family:'Poppins', sans-serif; font-weight:600; font-size:44px; color:var(--cream);
+           border:3px solid var(--gold); border-radius:22px; padding:18px 40px; }
+  .ad    { font-family:'Poppins', sans-serif; font-weight:500; font-size:26px; color:var(--blush); opacity:.85; }
+</style>
+</head>
+<body>
+<div class="c {{STORY_CLASS}}">
+  <div class="brand">ट्रेंडी बहना</div>
+  <div class="name">Trendy Behna</div>
+  <div class="chip">{{CATEGORY}}</div>
+  <div class="title">{{TITLE}}</div>
+  <div class="facts">{{FACTS}}</div>
+  <div class="store">{{CTA}}</div>
+  <div class="ad">{{AD}}</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+"""Per-channel captions. Compliance rules live here and are covered by tests:
+- every caption carries an affiliate disclosure (ASCI);
+- Amazon: never a price (Associates rules), always "Check price on Amazon" + the Associates statement;
+- other stores: a price only if it was checked within PRICE_FRESH of posting time.
+"""
+from __future__ import annotations
+
+import html
+from datetime import datetime, timedelta
+
+from .deals import Deal
+
+PRICE_FRESH = timedelta(hours=24)
+WA_CHANNEL = "https://whatsapp.com/channel/0029VbDUg6xFnSzI6HUqs71y"
+TG_CHANNEL = "https://t.me/trendybehna"
+DISCLOSURE = "#ad Affiliate link: aapka price same rehta hai, humein chhota commission milta hai."
+AMAZON_STATEMENT = "As an Amazon Associate I earn from qualifying purchases."
+
+
+def fmt_count(n: int) -> str:
+    """Stores show "7.3k"; don't print more precision than the source had."""
+    return f"{n / 1000:.1f}".rstrip("0").rstrip(".") + "k" if n >= 1000 else str(n)
+
+
+def show_price(deal: Deal, now: datetime) -> bool:
+    return (deal.store != "amazon" and deal.price is not None and deal.checked_at is not None
+            and now - deal.checked_at <= PRICE_FRESH)
+
+
+def facts(deal: Deal, now: datetime) -> list[str]:
+    out = []
+    if show_price(deal, now):
+        p = f"₹{deal.price:,}"
+        if deal.discount_pct:
+            p += f" (MRP ₹{deal.mrp:,}, {deal.discount_pct}% off)"
+        out.append(f"Price: {p}, {deal.checked_at:%d %b} ko check kiya, badal sakta hai")
+    if deal.rating and deal.ratings_count:
+        out.append(f"Rating: {deal.rating}★ ({fmt_count(deal.ratings_count)} ratings)")
+    return out
+
+
+def cta(deal: Deal) -> str:
+    return "Check price on Amazon" if deal.store == "amazon" else f"{deal.store_name} pe dekho"
+
+
+def footer(deal: Deal) -> str:
+    return DISCLOSURE + (" " + AMAZON_STATEMENT if deal.store == "amazon" else "")
+
+
+TG_CAPTION_MAX = 1024
+
+
+def telegram(deal: Deal, now: datetime) -> str:
+    """HTML parse_mode. Shortens the plain-text blurb, then the title, BEFORE escaping, so the result is always
+    valid HTML within Telegram's caption limit (slicing escaped HTML could cut an entity or the <b> tag)."""
+    e = html.escape
+
+    def build(title: str, blurb: str) -> str:
+        lines = [f"<b>{e(title)}</b>", ""]
+        if blurb:
+            lines += [e(blurb), ""]
+        lines += [e(f) for f in facts(deal, now)]
+        lines += ["", f"👉 {e(cta(deal))}: {e(deal.url)}", "", e(footer(deal))]
+        return "\n".join(lines).replace("\n\n\n", "\n\n")
+
+    title, blurb = deal.title, deal.blurb
+    out = build(title, blurb)
+    while len(out) > TG_CAPTION_MAX and blurb:
+        blurb = blurb[: max(len(blurb) - (len(out) - TG_CAPTION_MAX) - 1, 0)].rstrip()
+        blurb = blurb + "…" if blurb else ""
+        out = build(title, blurb)
+    while len(out) > TG_CAPTION_MAX and len(title) > 10:
+        title = title[: max(len(title) - (len(out) - TG_CAPTION_MAX) - 1, 10)].rstrip() + "…"
+        out = build(title, blurb)
+    if len(out) > TG_CAPTION_MAX:
+        raise ValueError(f"deal {deal.id}: telegram caption cannot fit {TG_CAPTION_MAX} chars (url too long?)")
+    return out
+
+
+def facebook(deal: Deal, now: datetime) -> str:
+    lines = [deal.title, ""]
+    if deal.blurb:
+        lines += [deal.blurb, ""]
+    lines += facts(deal, now)
+    lines += ["", f"👉 {cta(deal)}: {deal.url}", "", f"Roz ki deals: WhatsApp {WA_CHANNEL}", "", footer(deal)]
+    return "\n".join(lines).replace("\n\n\n", "\n\n")
+
+
+def instagram(deal: Deal, now: datetime) -> str:
+    """Instagram captions cannot hold clickable links; send people to the channels in the bio."""
+    lines = [deal.title, ""]
+    if deal.blurb:
+        lines += [deal.blurb, ""]
+    lines += facts(deal, now)
+    lines += ["", "Link: bio mein WhatsApp / Telegram channel 👆", "", footer(deal)]
+    tags = " ".join(f"#{t}" for t in deal.tags[:8])
+    return "\n".join(lines + ([tags] if tags else [])).replace("\n\n\n", "\n\n")

@@ -1,0 +1,16 @@
+# Deal queue, posted top to bottom (one deal per run, to every configured channel).
+# Rules (enforced in tb/captions.py and tests):
+#  - url: an affiliate link we verified resolves to the product with our id (EarnKaro 5753779 / Amazon tag trendybehna-21)
+#  - Amazon: never a price; other stores: price shown only within 24h of checked_at
+#  - only real products we checked in the store app: in stock, rating 4.0+ with a meaningful ratings count
+- id: myntra-11076740
+  store: myntra
+  title: Mitera Navy Blue Kanjeevaram Silk Blend Saree
+  category: Saree
+  blurb: Shaadi aur Diwali ke liye classic Kanjeevaram look, navy aur gold zari.
+  url: https://myntr.it/szhFl4R
+  price: 2399
+  rating: 4.1
+  ratings_count: 7300
+  checked_at: 2026-10-30T02:40:00+00:00
+  tags: [saree, kanjeevaram, diwali, myntra, trendybehna]

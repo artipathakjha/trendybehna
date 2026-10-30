@@ -1,0 +1,10 @@
+.env*
+*.keystore
+*.jks
+keystore.properties
+credentials.json
+*.pem
+*.p12
+__pycache__/
+.pytest_cache/
+out/

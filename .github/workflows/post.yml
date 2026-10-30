@@ -1,0 +1,63 @@
+name: post-deals
+
+on:
+  schedule:
+    # a few minutes off the hour: GitHub delays or drops on-the-hour schedules under load
+    - cron: "37 4 * * *"   # 10:07 IST
+    - cron: "37 8 * * *"   # 14:07 IST
+    - cron: "7 14 * * *"   # 19:37 IST, also an Instagram feed post
+  workflow_dispatch:
+    inputs:
+      ig_feed:
+        description: "Also publish an Instagram feed post"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: post-deals
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      # pinned to commit SHAs: this job holds the posting secrets
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Chrome present (renders the cards)
+        run: google-chrome --version
+      - name: Post next deal
+        id: post
+        continue-on-error: true
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python -m tb.main ${{ (github.event.schedule == '7 14 * * *' || inputs.ig_feed) && '--ig-feed' || '' }}
+      - name: Save posting state (rebase onto any newer push, retry)
+        if: always()
+        run: |
+          git config user.name "trendybehna-bot"
+          git config user.email "trendybehna-bot@users.noreply.github.com"
+          git add state/posted.json
+          git diff --cached --quiet && exit 0
+          git commit -m "state: posted $(date -u +%FT%TZ)"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 5))
+          done
+          echo "::error::could not push state/posted.json; the next run may repost this deal"
+          exit 1
+      - name: Fail the run if posting failed (GitHub emails the repo owner)
+        if: steps.post.outcome == 'failure'
+        run: exit 1
