@@ -471,3 +471,18 @@ def test_reel_music_replaces_silent_bed():
     assert "m.wav" in with_music and "anullsrc=r=48000:cl=stereo" not in with_music
     voiced = reel.ffmpeg_args(pngs, [2.6, 3.8, 3.2], Path("o.mp4"), [Path("v.mp3")], music=Path("m.wav"))
     assert "volume=0.35" in voiced[voiced.index("-filter_complex") + 1]  # music ducks under a voice
+
+
+def test_site_lists_posted_deals_newest_first_with_sponsored_links():
+    from tb import site
+    a = deal(id="a", title="Old <Saree>")
+    b = deal(id="b", store="amazon", url="https://www.amazon.in/dp/B0?tag=trendybehna-21", title="New Earrings")
+    c = deal(id="c", title="Not posted yet")
+    state = {"a": {"telegram": "2026-10-29T05:00:00+00:00 1"}, "b": {"facebook": "2026-10-30T05:00:00+00:00 2"},
+             "c": {"telegram": "skipped 2026-10-30T05:00:00+00:00 err"}}
+    page = site.build([a, b, c], state, NOW)
+    assert page.index("New Earrings") < page.index("Old &lt;Saree&gt;")      # newest first, escaped
+    assert "Not posted yet" not in page                                      # skipped/unposted deals stay off
+    assert page.count('rel="sponsored nofollow noopener"') == 2
+    assert "As an Amazon Associate" in page and "#ad" in page
+    assert "{{" not in page
