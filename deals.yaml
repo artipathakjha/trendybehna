@@ -14,3 +14,65 @@
   ratings_count: 7300
   checked_at: 2026-10-30T02:40:00+00:00
   tags: [saree, kanjeevaram, diwali, myntra, trendybehna]
+
+# 2026-10-30 batch: Myntra sarees, popularity sort, rating/stock/price read from each product page ~11:00 IST
+- id: myntra-31819129
+  store: myntra
+  title: Anouk Floral Sequinned Organza Saree
+  category: Saree
+  blurb: Halki organza pe sequin floral kaam, Diwali party aur shaadi function dono ke liye.
+  url: https://myntr.it/hwh7LL5
+  price: 1090
+  mrp: 9999
+  rating: 4.2
+  ratings_count: 10800
+  checked_at: 2026-10-30T05:30:00+00:00
+  tags: [saree, organza, sequin, diwali, myntra, trendybehna]
+- id: myntra-33482297
+  store: myntra
+  title: Saree mall Floral Sequinned Pure Georgette Saree
+  category: Saree
+  blurb: Georgette ka flowy drape aur sequin floral, 11 hazaar se zyada ratings wali popular saree.
+  url: https://myntr.it/ge8y6zO
+  price: 1300
+  mrp: 8999
+  rating: 4.3
+  ratings_count: 11000
+  checked_at: 2026-10-30T05:30:00+00:00
+  tags: [saree, georgette, sequin, festive, myntra, trendybehna]
+- id: myntra-33360023
+  store: myntra
+  title: House of Pataudi Art Silk Kanjivaram Pink Saree
+  category: Saree
+  blurb: Pink Kanjivaram look, art silk mein, budget mein shaadi wala traditional style.
+  url: https://myntr.it/Jq9z6Jz
+  price: 1313
+  mrp: 6199
+  rating: 4.3
+  ratings_count: 2500
+  checked_at: 2026-10-30T05:30:00+00:00
+  tags: [saree, kanjivaram, silk, wedding, myntra, trendybehna]
+- id: myntra-40445931
+  store: myntra
+  title: Anouk Floral Ready To Wear Organza Designer Saree
+  category: Saree
+  blurb: Ready to wear saree, jaldi pehenne wali; organza pe floral kaam, festive look ke liye.
+  url: https://myntr.it/Sc8kTTO
+  price: 1483
+  mrp: 6999
+  rating: 4.2
+  ratings_count: 10800
+  checked_at: 2026-10-30T05:30:00+00:00
+  tags: [saree, readytowear, organza, festive, myntra, trendybehna]
+- id: myntra-30881028
+  store: myntra
+  title: House of Pataudi Embroidered Bandhani Saree with Blouse Piece
+  category: Saree
+  blurb: Bandhani print pe embroidery, blouse piece saath mein, puja aur festive mauke ke liye.
+  url: https://myntr.it/J4DhDiw
+  price: 1767
+  mrp: 4747
+  rating: 4.1
+  ratings_count: 8400
+  checked_at: 2026-10-30T05:30:00+00:00
+  tags: [saree, bandhani, puja, festive, myntra, trendybehna]
