@@ -238,6 +238,38 @@ def test_instagram_story_and_feed_are_separate_units(tmp_path, monkeypatch):
     assert len(stories) == 1                                        # story never re-published
 
 
+def test_min_gap_skips_backup_triggers(tmp_path, monkeypatch):
+    from datetime import datetime as dt
+    deals = tmp_path / "deals.yaml"
+    deals.write_text("- {id: a, store: myntra, title: T, url: 'https://x', category: C}\n"
+                     "- {id: b, store: myntra, title: T, url: 'https://x', category: C}\n", encoding="utf-8")
+    state = tmp_path / "posted.json"
+    recent = (dt.now(timezone.utc) - timedelta(hours=1)).isoformat(timespec="seconds")
+    state.write_text('{"a": {"telegram": "%s 1", "facebook": "skipped 2026-01-01T00:00:00+00:00 x"}}' % recent,
+                     encoding="utf-8")
+    monkeypatch.setattr(tbmain, "DEALS", deals)
+    monkeypatch.setattr(tbmain, "STATE", state)
+    monkeypatch.setattr(tbmain, "render", lambda d, k, p, n: p)
+    monkeypatch.setenv("TG_BOT_TOKEN", "t")
+    monkeypatch.setenv("TG_CHAT", "@c")
+    for k in ("FB_PAGE_ID", "FB_PAGE_TOKEN", "IG_USER_ID"):
+        monkeypatch.delenv(k, raising=False)
+    sent = []
+    monkeypatch.setattr(tbmain.telegram, "post", lambda *a: sent.append(1) or "2")
+    assert tbmain.main(["--out", str(tmp_path), "--min-gap-hours", "3"]) == 0 and sent == []   # backup: skip
+    assert tbmain.main(["--out", str(tmp_path), "--min-gap-hours", "0.5"]) == 0 and sent == [1]  # gap passed: post
+
+
+def test_last_post_time_ignores_skips_and_meta():
+    from tb.deals import last_post_time
+    s = {"_channels": {"telegram": "2030-01-01T00:00:00+00:00"},
+         "a": {"telegram": "2026-10-30T04:00:00+00:00 1", "facebook": "skipped 2029-01-01T00:00:00+00:00 err",
+               "_fail": {"facebook": 3}},
+         "b": {"instagram": "2026-10-30T05:00:00+00:00 9"}}
+    assert last_post_time(s).hour == 5
+    assert last_post_time({}) is None
+
+
 def test_check_queue_warns_when_low(tmp_path, monkeypatch):
     deals = tmp_path / "deals.yaml"
     deals.write_text("".join(f"- {{id: d{i}, store: myntra, title: T, url: 'https://x', category: C}}\n"

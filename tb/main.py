@@ -20,7 +20,8 @@ from pathlib import Path
 
 from . import captions
 from .channels import meta, telegram
-from .deals import load_deals, load_state, needs, next_deal, record_failure, register_channels, save_state
+from .deals import (last_post_time, load_deals, load_state, needs, next_deal, record_failure, register_channels,
+                    save_state)
 from .render import render
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -69,6 +70,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path, help="keep rendered cards in this folder")
     ap.add_argument("--check-queue", type=int, metavar="N",
                     help="post nothing; exit 4 if fewer than N deals are still waiting (early refill warning)")
+    ap.add_argument("--min-gap-hours", type=float, default=0,
+                    help="skip (exit 0) if anything was posted less than this many hours ago; lets several "
+                         "backup schedule triggers cover one slot without double-posting")
     a = ap.parse_args(argv)
     sys.stdout.reconfigure(encoding="utf-8")  # ₹ and emoji in JSON logs on any console
 
@@ -85,6 +89,12 @@ def main(argv: list[str] | None = None) -> int:
             log(level="error", msg=f"deal queue running low: {waiting} left (about {waiting / 3:.1f} days); add deals")
             return 4
         return 0
+    if a.min_gap_hours and not a.dry_run:
+        last = last_post_time(state)
+        if last and (now - last).total_seconds() < a.min_gap_hours * 3600:
+            log(msg="skip: posted recently", last_post=last.isoformat(timespec="seconds"),
+                min_gap_hours=a.min_gap_hours)
+            return 0
     if not a.dry_run:
         register_channels(state, channels, now)
     deal = next_deal(deals, state, channels)

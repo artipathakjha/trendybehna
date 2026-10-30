@@ -105,6 +105,18 @@ def first_posted(entry: dict) -> datetime | None:
     return min(times) if times else None
 
 
+def last_post_time(state: State) -> datetime | None:
+    """Most recent successful post across all deals and channels."""
+    times = []
+    for k, entry in state.items():
+        if k.startswith("_"):
+            continue
+        for ch, v in entry.items():
+            if not ch.startswith("_") and isinstance(v, str) and not v.startswith("skipped"):
+                times.append(datetime.fromisoformat(v.split(" ", 1)[0]))
+    return max(times) if times else None
+
+
 def needs(state: State, deal_id: str, channel: str) -> bool:
     """A channel needs a deal unless it already has it, or the deal went out before the channel was
     enabled (so switching on a new channel does not replay the whole back catalogue)."""

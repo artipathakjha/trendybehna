@@ -2,10 +2,17 @@ name: post-deals
 
 on:
   schedule:
-    # a few minutes off the hour: GitHub delays or drops on-the-hour schedules under load
+    # GitHub delays and sometimes DROPS scheduled runs (the first 14:07 slot never fired on 2026-10-30), so each
+    # slot has 3 triggers ~20 min apart; scheduled runs pass --min-gap-hours 3, so only the first one that fires posts.
     - cron: "37 4 * * *"   # 10:07 IST
+    - cron: "58 4 * * *"   #   backup
+    - cron: "23 5 * * *"   #   backup
     - cron: "37 8 * * *"   # 14:07 IST
-    - cron: "7 14 * * *"   # 19:37 IST, also an Instagram feed post
+    - cron: "58 8 * * *"   #   backup
+    - cron: "23 9 * * *"   #   backup
+    - cron: "7 14 * * *"   # 19:37 IST, also an Instagram feed post (any trigger in hour 14 UTC)
+    - cron: "28 14 * * *"  #   backup
+    - cron: "53 14 * * *"  #   backup
   workflow_dispatch:
     inputs:
       ig_feed:
@@ -43,7 +50,7 @@ jobs:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
-        run: python -m tb.main ${{ (github.event.schedule == '7 14 * * *' || inputs.ig_feed) && '--ig-feed' || '' }}
+        run: python -m tb.main ${{ github.event_name == 'schedule' && '--min-gap-hours 3' || '' }} ${{ ((github.event_name == 'schedule' && endsWith(github.event.schedule, ' 14 * * *')) || inputs.ig_feed) && '--ig-feed' || '' }}
       - name: Save posting state (rebase onto any newer push, retry)
         if: always()
         run: |
