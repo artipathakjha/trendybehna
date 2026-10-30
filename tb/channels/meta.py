@@ -24,6 +24,27 @@ def resolve_page_token(page_id: str, token: str) -> tuple[str, str]:
     return body["access_token"], "derived-from-user"
 
 
+def _day(ts: int | None) -> str:
+    return "never" if not ts else time.strftime("%Y-%m-%d", time.gmtime(ts))  # Graph uses 0 for "no expiry"
+
+
+def check(page_id: str, token: str, ig_user: str | None) -> str:
+    """Prove FB_PAGE_TOKEN reaches the Page (and the Instagram account) and report when it expires; posts nothing."""
+    info = call("GET", f"{GRAPH}/debug_token", secret=token,
+                params={"input_token": token, "access_token": token})["data"]
+    if not info.get("is_valid"):
+        raise ApiError("FB_PAGE_TOKEN is not valid")
+    page_token, kind = resolve_page_token(page_id, token)
+    page = call("GET", f"{GRAPH}/{page_id}", secret=page_token, params={"fields": "name", "access_token": page_token})
+    out = (f"page '{page['name']}' via {kind} token; token expires {_day(info.get('expires_at'))}, "
+           f"data access expires {_day(info.get('data_access_expires_at'))}")
+    if ig_user:
+        ig = call("GET", f"{GRAPH}/{ig_user}", secret=page_token,
+                  params={"fields": "username", "access_token": page_token})
+        out += f"; instagram @{ig['username']}"
+    return out
+
+
 def fb_photo(page_id: str, token: str, photo: Path, message: str, published: bool = True) -> str:
     data = {"message": message, "published": str(published).lower(), "access_token": token}
     if not published:

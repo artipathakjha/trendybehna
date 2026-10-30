@@ -7,6 +7,16 @@ from pathlib import Path
 from ..http import call
 
 
+def check(token: str, chat: str) -> str:
+    """Prove the token works and the bot may post in the channel; posts nothing."""
+    me = call("GET", f"https://api.telegram.org/bot{token}/getMe", secret=token)["result"]
+    member = call("GET", f"https://api.telegram.org/bot{token}/getChatMember", secret=token,
+                  params={"chat_id": chat, "user_id": me["id"]})["result"]
+    if member["status"] != "administrator" or not member.get("can_post_messages"):
+        raise RuntimeError(f"@{me['username']} is {member['status']} in {chat} without post rights")
+    return f"@{me['username']} can post to {chat}"
+
+
 def post(token: str, chat: str, photo: Path, caption: str, button_text: str, url: str) -> str:
     with photo.open("rb") as f:
         body = call("POST", f"https://api.telegram.org/bot{token}/sendPhoto", secret=token,

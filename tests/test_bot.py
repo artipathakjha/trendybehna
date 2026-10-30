@@ -320,3 +320,52 @@ def test_bad_page_token_fails_meta_units_but_telegram_still_posts(tmp_path, monk
     s = json.loads(state.read_text())
     assert "telegram" in s["a"]
     assert s["a"]["_fail"] == {"facebook": 1, "instagram": 1}
+
+
+def fake_api(monkeypatch, routes):
+    """Route http.requests.request by URL substring to a canned JSON body; records every URL called."""
+    seen = []
+
+    def req(method, url, **kw):
+        seen.append(url)
+        return FakeResp(200, next(body for part, body in routes.items() if part in url))
+    monkeypatch.setattr(http.requests, "request", req)
+    return seen
+
+
+def test_telegram_check_requires_post_rights(monkeypatch):
+    from tb.channels import telegram
+    me = {"ok": True, "result": {"id": 7, "username": "tb_bot"}}
+    fake_api(monkeypatch, {"getMe": me, "getChatMember": {"ok": True, "result": {"status": "administrator",
+                                                                                   "can_post_messages": True}}})
+    assert telegram.check("t", "@c") == "@tb_bot can post to @c"
+    fake_api(monkeypatch, {"getMe": me, "getChatMember": {"ok": True, "result": {"status": "member"}}})
+    with pytest.raises(RuntimeError, match="without post rights"):
+        telegram.check("t", "@c")
+
+
+def test_meta_check_reports_expiry_and_never_posts(monkeypatch):
+    from tb.channels import meta
+    seen = fake_api(monkeypatch, {
+        "debug_token": {"data": {"is_valid": True, "expires_at": 0, "data_access_expires_at": 1801151152}},
+        "/me": {"id": "99"},  # not the Page id, so the Page token is derived from the user token
+        "/1": {"access_token": "pt", "name": "Trendy Behna"},
+        "/2": {"username": "trendybehna"},
+    })
+    out = meta.check("1", "ut", "2")
+    assert "via derived-from-user token" in out and "token expires never" in out and "@trendybehna" in out
+    assert not any(u.endswith(("/photos", "/media", "/media_publish")) for u in seen)
+
+
+def test_check_channels_posts_nothing_and_fails_loudly(tmp_path, monkeypatch):
+    monkeypatch.setattr(tbmain, "STATE", tmp_path / "posted.json")
+    monkeypatch.setenv("TG_BOT_TOKEN", "t")
+    monkeypatch.setenv("TG_CHAT", "@c")
+    for k in ("FB_PAGE_ID", "FB_PAGE_TOKEN", "IG_USER_ID"):
+        monkeypatch.delenv(k, raising=False)
+    monkeypatch.setattr(tbmain.telegram, "post", lambda *a: pytest.fail("check must not post"))
+    monkeypatch.setattr(tbmain.telegram, "check", lambda tok, chat: "@b can post to @c")
+    assert tbmain.main(["--check-channels"]) == 0
+    monkeypatch.setattr(tbmain.telegram, "check", lambda tok, chat: (_ for _ in ()).throw(RuntimeError("401")))
+    assert tbmain.main(["--check-channels"]) == 5
+    assert not (tmp_path / "posted.json").exists()

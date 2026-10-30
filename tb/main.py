@@ -1,6 +1,6 @@
 """Post the next unposted deal to every configured channel.
 
-usage: python -m tb.main [--dry-run] [--ig-feed]
+usage: python -m tb.main [--dry-run] [--ig-feed] [--check-channels]
 Channels turn on when their secrets are set:
   telegram:  TG_BOT_TOKEN, TG_CHAT (e.g. @trendybehna)
   facebook:  FB_PAGE_ID, FB_PAGE_TOKEN
@@ -48,6 +48,20 @@ def enabled_channels(env=os.environ) -> list[str]:
 META_UNITS = {"facebook", "instagram", "instagram_feed"}
 
 
+def check_channels(channels: list[str]) -> int:
+    """Post nothing; prove every configured channel's secrets work. Run after adding or rotating a secret."""
+    env, failed = os.environ, 0
+    probes = {"telegram": lambda: telegram.check(env["TG_BOT_TOKEN"], env["TG_CHAT"]),
+              "facebook": lambda: meta.check(env["FB_PAGE_ID"], env["FB_PAGE_TOKEN"], env.get("IG_USER_ID"))}
+    for ch in [c for c in channels if c in probes]:  # instagram rides on the facebook probe (same Page token)
+        try:
+            log(msg="channel ok", channel=ch, detail=probes[ch]())
+        except Exception as ex:
+            failed += 1
+            log(level="error", msg="channel check failed", channel=ch, error=str(ex))
+    return 5 if failed else 0
+
+
 def publish(unit: str, deal, feed: Path, story: Path | None, now: datetime, page_token: str | None) -> str:
     env = os.environ
     if unit == "telegram":
@@ -73,6 +87,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--min-gap-hours", type=float, default=0,
                     help="skip (exit 0) if anything was posted less than this many hours ago; lets several "
                          "backup schedule triggers cover one slot without double-posting")
+    ap.add_argument("--check-channels", action="store_true",
+                    help="post nothing; verify each configured channel's secrets, exit 5 if any fails")
     a = ap.parse_args(argv)
     sys.stdout.reconfigure(encoding="utf-8")  # ₹ and emoji in JSON logs on any console
 
@@ -81,6 +97,8 @@ def main(argv: list[str] | None = None) -> int:
     if not channels:
         log(level="error", msg="no channels configured")
         return 2
+    if a.check_channels:
+        return check_channels(channels)
     deals, state = load_deals(DEALS), load_state(STATE)
     if a.check_queue is not None:
         waiting = sum(any(needs(state, d.id, ch) for ch in channels) for d in deals)

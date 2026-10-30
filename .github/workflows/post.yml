@@ -24,6 +24,10 @@ on:
         description: "Skip if something was posted in the last 3 hours (set by external timers, so they never double-post)"
         type: boolean
         default: false
+      check:
+        description: "Post nothing; only verify the secrets work (run after adding or changing one)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -59,7 +63,7 @@ jobs:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
-        run: python -m tb.main ${{ (github.event_name == 'schedule' || inputs.guard) && '--min-gap-hours 3' || '' }} ${{ ((github.event_name == 'schedule' && endsWith(github.event.schedule, ' 14 * * *')) || inputs.ig_feed) && '--ig-feed' || '' }}
+        run: python -m tb.main ${{ inputs.check && '--check-channels' || '' }} ${{ (github.event_name == 'schedule' || inputs.guard) && '--min-gap-hours 3' || '' }} ${{ ((github.event_name == 'schedule' && endsWith(github.event.schedule, ' 14 * * *')) || inputs.ig_feed) && '--ig-feed' || '' }}
       - name: Save posting state (rebase onto any newer push, retry)
         if: always()
         run: |
