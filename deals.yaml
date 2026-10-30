@@ -12,10 +12,13 @@
   price: 2399
   rating: 4.1
   ratings_count: 7300
-  checked_at: 2026-10-30T02:40:00+00:00
-  tags: [saree, kanjeevaram, diwali, myntra, trendybehna]
-
-# 2026-10-30 batch: Myntra sarees, popularity sort, rating/stock/price read from each product page ~11:00 IST
+  checked_at: 2026-10-30 02:40:00+00:00
+  tags:
+  - saree
+  - kanjeevaram
+  - diwali
+  - myntra
+  - trendybehna
 - id: myntra-31819129
   store: myntra
   title: Anouk Floral Sequinned Organza Saree
@@ -26,8 +29,48 @@
   mrp: 9999
   rating: 4.2
   ratings_count: 10800
-  checked_at: 2026-10-30T05:30:00+00:00
-  tags: [saree, organza, sequin, diwali, myntra, trendybehna]
+  checked_at: 2026-10-30 05:30:00+00:00
+  tags:
+  - saree
+  - organza
+  - sequin
+  - diwali
+  - myntra
+  - trendybehna
+- id: myntra-32145448
+  store: myntra
+  title: MOKOSH Silk Embroidered Anarkali Kurta, Pant & Dupatta Set
+  category: Kurta Set
+  blurb: Anarkali flare aur embroidery, poora set ek saath; 15 hazaar se zyada ratings.
+  url: https://myntr.it/YgZ6arM
+  price: 1489
+  mrp: 4299
+  rating: 4.5
+  ratings_count: 15200
+  checked_at: &id001 2026-10-30 07:15:00+00:00
+  tags:
+  - kurtaset
+  - anarkali
+  - festive
+  - myntra
+  - trendybehna
+- id: myntra-15515686
+  store: myntra
+  title: Rubans 24K Gold-Plated Ruby & Emerald Floral Choker Set
+  category: Jewellery
+  blurb: Ruby-emerald look wala choker set, saree aur lehenga dono pe jachega.
+  url: https://myntr.it/DZnpFSF
+  price: 610
+  mrp: 5544
+  rating: 4.4
+  ratings_count: 7600
+  checked_at: &id002 2026-10-30 07:25:00+00:00
+  tags:
+  - jewellery
+  - choker
+  - rubans
+  - myntra
+  - trendybehna
 - id: myntra-33482297
   store: myntra
   title: Saree mall Floral Sequinned Pure Georgette Saree
@@ -38,8 +81,48 @@
   mrp: 8999
   rating: 4.3
   ratings_count: 11000
-  checked_at: 2026-10-30T05:30:00+00:00
-  tags: [saree, georgette, sequin, festive, myntra, trendybehna]
+  checked_at: 2026-10-30 05:30:00+00:00
+  tags:
+  - saree
+  - georgette
+  - sequin
+  - festive
+  - myntra
+  - trendybehna
+- id: myntra-19674622
+  store: myntra
+  title: Libas Peach Floral Kurta with Trousers & Dupatta
+  category: Kurta Set
+  blurb: Libas ka peach floral set, office se puja tak chalne wala.
+  url: https://myntr.it/u0mikR1
+  price: 2649
+  mrp: 7999
+  rating: 4.5
+  ratings_count: 13200
+  checked_at: *id001
+  tags:
+  - kurtaset
+  - libas
+  - floral
+  - myntra
+  - trendybehna
+- id: myntra-9587371
+  store: myntra
+  title: Rubans Gold-Plated Kundan Layered Jhumka Earrings
+  category: Earrings
+  blurb: Kundan layered jhumke, ethnic outfit ka poora look badal dete hain.
+  url: https://myntr.it/ZvztHDS
+  price: 666
+  mrp: 2914
+  rating: 4.5
+  ratings_count: 3600
+  checked_at: *id002
+  tags:
+  - jhumka
+  - earrings
+  - kundan
+  - myntra
+  - trendybehna
 - id: myntra-33360023
   store: myntra
   title: House of Pataudi Art Silk Kanjivaram Pink Saree
@@ -50,8 +133,48 @@
   mrp: 6199
   rating: 4.3
   ratings_count: 2500
-  checked_at: 2026-10-30T05:30:00+00:00
-  tags: [saree, kanjivaram, silk, wedding, myntra, trendybehna]
+  checked_at: 2026-10-30 05:30:00+00:00
+  tags:
+  - saree
+  - kanjivaram
+  - silk
+  - wedding
+  - myntra
+  - trendybehna
+- id: myntra-27475542
+  store: myntra
+  title: KALINI Ethnic Printed Kurta with Trouser & Dupatta
+  category: Kurta Set
+  blurb: Roz pehenne layak printed set, thread work ke saath.
+  url: https://myntr.it/deoUEvH
+  price: 1499
+  mrp: 5999
+  rating: 4.3
+  ratings_count: 11100
+  checked_at: *id001
+  tags:
+  - kurtaset
+  - printed
+  - daily
+  - myntra
+  - trendybehna
+- id: myntra-34335028
+  store: myntra
+  title: Zaveri Pearls Set of 2 Gold-Plated Stone Studded Jewellery Sets
+  category: Jewellery
+  blurb: Ek price mein do sets, alag-alag outfits ke liye.
+  url: https://myntr.it/p8fjNVB
+  price: 1100
+  mrp: 5495
+  rating: 4.6
+  ratings_count: 2100
+  checked_at: *id002
+  tags:
+  - jewellery
+  - zaveripearls
+  - set
+  - myntra
+  - trendybehna
 - id: myntra-40445931
   store: myntra
   title: Anouk Floral Ready To Wear Organza Designer Saree
@@ -62,8 +185,48 @@
   mrp: 6999
   rating: 4.2
   ratings_count: 10800
-  checked_at: 2026-10-30T05:30:00+00:00
-  tags: [saree, readytowear, organza, festive, myntra, trendybehna]
+  checked_at: 2026-10-30 05:30:00+00:00
+  tags:
+  - saree
+  - readytowear
+  - organza
+  - festive
+  - myntra
+  - trendybehna
+- id: myntra-36081226
+  store: myntra
+  title: colorkosh Floral Embroidered Kurta with Palazzos
+  category: Kurta Set
+  blurb: Palazzo ke saath floral embroidered kurta, comfortable aur festive dono.
+  url: https://myntr.it/8yo4R4o
+  price: 1875
+  mrp: 3099
+  rating: 4.4
+  ratings_count: 8800
+  checked_at: *id001
+  tags:
+  - kurtaset
+  - palazzo
+  - embroidered
+  - myntra
+  - trendybehna
+- id: myntra-29235468
+  store: myntra
+  title: PALMONAS 18k Gold Plated Huggie Hoop Anti-Tarnish Earrings
+  category: Earrings
+  blurb: Waterproof aur anti-tarnish huggie hoops, roz pehenne ke liye.
+  url: https://myntr.it/S7qR5F0
+  price: 1079
+  mrp: 3999
+  rating: 4.4
+  ratings_count: 2200
+  checked_at: *id002
+  tags:
+  - earrings
+  - hoops
+  - antitarnish
+  - myntra
+  - trendybehna
 - id: myntra-30881028
   store: myntra
   title: House of Pataudi Embroidered Bandhani Saree with Blouse Piece
@@ -74,5 +237,95 @@
   mrp: 4747
   rating: 4.1
   ratings_count: 8400
-  checked_at: 2026-10-30T05:30:00+00:00
-  tags: [saree, bandhani, puja, festive, myntra, trendybehna]
+  checked_at: 2026-10-30 05:30:00+00:00
+  tags:
+  - saree
+  - bandhani
+  - puja
+  - festive
+  - myntra
+  - trendybehna
+- id: myntra-40029129
+  store: myntra
+  title: all about you Chikankari Kurta with Palazzos & Dupatta
+  category: Kurta Set
+  blurb: Chikankari kaam wala set, halka aur elegant.
+  url: https://myntr.it/f7tCblj
+  price: 1626
+  mrp: 5199
+  rating: 4.4
+  ratings_count: 5300
+  checked_at: *id001
+  tags:
+  - kurtaset
+  - chikankari
+  - myntra
+  - trendybehna
+- id: myntra-31430396
+  store: myntra
+  title: Rubans Gold-Plated Ruby & Kundan Necklace Set with Jhumkas
+  category: Jewellery
+  blurb: Necklace aur jhumke ka matching set, festive mauke ke liye.
+  url: https://myntr.it/k0YFQ9d
+  price: 695
+  mrp: 3475
+  rating: 4.2
+  ratings_count: 2400
+  checked_at: *id002
+  tags:
+  - jewellery
+  - necklace
+  - jhumka
+  - myntra
+  - trendybehna
+- id: myntra-39187946
+  store: myntra
+  title: Sangria Embroidered Round Neck Kurta & Palazzos
+  category: Kurta Set
+  blurb: Embroidered kurta aur palazzo, Diwali ke liye ready look.
+  url: https://myntr.it/hsH2Zjb
+  price: 1602
+  mrp: 6399
+  rating: 4.4
+  ratings_count: 3800
+  checked_at: *id001
+  tags:
+  - kurtaset
+  - sangria
+  - diwali
+  - myntra
+  - trendybehna
+- id: myntra-24947008
+  store: myntra
+  title: Rubans 22K Gold-Plated Kundan & CZ Traditional Necklace Set
+  category: Jewellery
+  blurb: Traditional kundan necklace set, shaadi season ke liye.
+  url: https://myntr.it/944cWNM
+  price: 1382
+  mrp: 5875
+  rating: 4.5
+  ratings_count: 1500
+  checked_at: *id002
+  tags:
+  - jewellery
+  - kundan
+  - wedding
+  - myntra
+  - trendybehna
+- id: myntra-38459602
+  store: myntra
+  title: BFC Geometric Jhumka Earrings
+  category: Earrings
+  blurb: Budget mein stylish jhumke, western aur ethnic dono ke saath.
+  url: https://myntr.it/Gp22rX0
+  price: 466
+  mrp: 3999
+  rating: 4.6
+  ratings_count: 954
+  checked_at: *id002
+  tags:
+  - jhumka
+  - earrings
+  - budget
+  - myntra
+  - trendybehna
