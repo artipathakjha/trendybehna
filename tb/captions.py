@@ -95,3 +95,31 @@ def instagram(deal: Deal, now: datetime) -> str:
     lines += ["", "Link: bio mein WhatsApp / Telegram channel 👆", "", footer(deal)]
     tags = " ".join(f"#{t}" for t in deal.tags[:8])
     return "\n".join(lines + ([tags] if tags else [])).replace("\n\n\n", "\n\n")
+
+
+THREADS_MAX = 500  # Threads rejects longer post text
+
+
+def threads(deal: Deal, now: datetime) -> str:
+    """Plain text; the URL is clickable on Threads. Shortens the blurb, then the title, to stay within 500 chars;
+    the #ad label, the link and the disclosure are never cut."""
+    def build(title: str, blurb: str) -> str:
+        lines = [f"#ad · {title}", ""]
+        if blurb:
+            lines += [blurb, ""]
+        lines += facts(deal, now)
+        lines += ["", f"👉 {cta(deal)}: {deal.url}", "", footer(deal)]
+        return "\n".join(lines).replace("\n\n\n", "\n\n")
+
+    title, blurb = deal.title, deal.blurb
+    out = build(title, blurb)
+    while len(out) > THREADS_MAX and blurb:
+        blurb = blurb[: max(len(blurb) - (len(out) - THREADS_MAX) - 1, 0)].rstrip()
+        blurb = blurb + "…" if blurb else ""
+        out = build(title, blurb)
+    while len(out) > THREADS_MAX and len(title) > 10:
+        title = title[: max(len(title) - (len(out) - THREADS_MAX) - 1, 10)].rstrip() + "…"
+        out = build(title, blurb)
+    if len(out) > THREADS_MAX:
+        raise ValueError(f"deal {deal.id}: threads text cannot fit {THREADS_MAX} chars")
+    return out

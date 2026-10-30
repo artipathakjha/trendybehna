@@ -486,3 +486,43 @@ def test_site_lists_posted_deals_newest_first_with_sponsored_links():
     assert page.count('rel="sponsored nofollow noopener"') == 2
     assert "As an Amazon Associate" in page and "#ad" in page
     assert "{{" not in page
+
+
+def test_threads_caption_fits_and_keeps_label_link_and_statement():
+    amz = deal(store="amazon", url="https://www.amazon.in/dp/B0?tag=trendybehna-21", title="T" * 300, blurb="B" * 400)
+    text = captions.threads(amz, NOW)
+    assert len(text) <= captions.THREADS_MAX and text.startswith("#ad")
+    assert "https://www.amazon.in/dp/B0?tag=trendybehna-21" in text and captions.AMAZON_STATEMENT in text
+    assert "₹" not in text
+    assert "https://myntr.it/x" in captions.threads(deal(), NOW)
+
+
+def test_threads_channel_needs_its_token():
+    env = {"FB_PAGE_ID": "1", "FB_PAGE_TOKEN": "t"}
+    assert "threads" not in tbmain.enabled_channels(env)
+    assert "threads" in tbmain.enabled_channels({**env, "THREADS_TOKEN": "th"})
+
+
+def test_threads_post_waits_for_container_then_publishes(monkeypatch):
+    from tb.channels import threads
+    states = iter([{"status": "IN_PROGRESS"}, {"status": "FINISHED"}])
+    calls = []
+
+    def req(method, url, **kw):
+        calls.append((method, url))
+        if url.endswith("/me/threads"):
+            assert kw["data"]["media_type"] == "IMAGE" and kw["data"]["image_url"] == "https://cdn/x.png"
+            return FakeResp(200, {"id": "c9"})
+        if url.endswith("/c9"):
+            return FakeResp(200, next(states))
+        return FakeResp(200, {"id": "p9"})
+    monkeypatch.setattr(http.requests, "request", req)
+    monkeypatch.setattr(threads.time, "sleep", lambda s: None)
+    assert threads.post("tok", "https://cdn/x.png", "#ad · hi") == "p9"
+    assert calls[-1][1].endswith("/me/threads_publish") and sum(u.endswith("/c9") for _, u in calls) == 2
+
+
+def test_errors_written_to_public_log_and_state_carry_no_urls():
+    msg = tbmain.public(RuntimeError("threads container c1 failed: {'error_message': "
+                                     "'cannot fetch https://scontent.xx.fbcdn.net/v/t39/p.png?oh=ab&oe=cd'}"))
+    assert "fbcdn" not in msg and "[url]" in msg

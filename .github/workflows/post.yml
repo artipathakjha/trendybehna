@@ -69,6 +69,7 @@ jobs:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
           REELS: "1"
           REEL_MUSIC: "1"
         run: python -m tb.main ${{ inputs.check && '--check-channels' || '' }} ${{ inputs.test_reel && '--test-reel' || '' }} ${{ (github.event_name == 'schedule' || inputs.guard) && '--min-gap-hours 3' || '' }} ${{ ((github.event_name == 'schedule' && endsWith(github.event.schedule, ' 14 * * *')) || inputs.ig_feed) && '--ig-feed' || '' }}

@@ -5,6 +5,7 @@ Channels turn on when their secrets are set:
   telegram:  TG_BOT_TOKEN, TG_CHAT (e.g. @trendybehna)
   facebook:  FB_PAGE_ID, FB_PAGE_TOKEN
   instagram: FB_PAGE_ID, FB_PAGE_TOKEN, IG_USER_ID   (Story; --ig-feed adds a best-effort feed post)
+  threads:   THREADS_TOKEN plus the FB secrets (the card reaches Threads through the Page's photo CDN)
   reels:     REELS=1 adds facebook_reel / instagram_reel (needs ffmpeg; see tb/reel.py);
              REEL_MUSIC=1 adds the per-deal original music from tb/music.py (needs numpy)
 State is saved after every post or failure, so a rerun never double-posts, and a channel that keeps
@@ -15,13 +16,14 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
 from . import captions
-from .channels import meta, telegram
+from .channels import meta, telegram, threads
 from .deals import (last_post_time, load_deals, load_state, needs, next_deal, record_failure, register_channels,
                     save_state)
 from .reel import render_reel
@@ -30,6 +32,12 @@ from .render import render
 ROOT = Path(__file__).resolve().parent.parent
 DEALS = ROOT / "deals.yaml"
 STATE = ROOT / "state" / "posted.json"
+
+
+def public(err: object) -> str:
+    """Error text as it may appear in the public run log and the public state/posted.json: web addresses removed
+    (API errors can echo signed CDN image URLs). Tokens are already redacted by tb/http.call."""
+    return re.sub(r"https?://\S+", "[url]", str(err))
 
 
 def log(**kw) -> None:
@@ -47,10 +55,12 @@ def enabled_channels(env=os.environ) -> list[str]:
             ch.append("instagram")
         if env.get("REELS") == "1":
             ch += ["facebook_reel"] + (["instagram_reel"] if env.get("IG_USER_ID") else [])
+        if env.get("THREADS_TOKEN"):
+            ch.append("threads")
     return ch
 
 
-META_UNITS = {"facebook", "instagram", "instagram_feed", "facebook_reel", "instagram_reel"}
+META_UNITS = {"facebook", "instagram", "instagram_feed", "facebook_reel", "instagram_reel", "threads"}
 REEL_UNITS = {"facebook_reel", "instagram_reel"}
 
 
@@ -58,13 +68,14 @@ def check_channels(channels: list[str]) -> int:
     """Post nothing; prove every configured channel's secrets work. Run after adding or rotating a secret."""
     env, failed = os.environ, 0
     probes = {"telegram": lambda: telegram.check(env["TG_BOT_TOKEN"], env["TG_CHAT"]),
-              "facebook": lambda: meta.check(env["FB_PAGE_ID"], env["FB_PAGE_TOKEN"], env.get("IG_USER_ID"))}
+              "facebook": lambda: meta.check(env["FB_PAGE_ID"], env["FB_PAGE_TOKEN"], env.get("IG_USER_ID")),
+              "threads": lambda: threads.check(env["THREADS_TOKEN"])}
     for ch in [c for c in channels if c in probes]:  # instagram rides on the facebook probe (same Page token)
         try:
             log(msg="channel ok", channel=ch, detail=probes[ch]())
         except Exception as ex:
             failed += 1
-            log(level="error", msg="channel check failed", channel=ch, error=str(ex))
+            log(level="error", msg="channel check failed", channel=ch, error=public(ex))
     return 5 if failed else 0
 
 
@@ -85,6 +96,8 @@ def publish(unit: str, deal, feed: Path, story: Path | None, now: datetime, page
         return meta.fb_reel(page, tok, reel, captions.facebook(deal, now))
     if unit == "instagram_reel":
         return meta.ig_reel(ig, tok, reel, captions.instagram(deal, now))
+    if unit == "threads":
+        return threads.post(env["THREADS_TOKEN"], meta.public_url(page, tok, feed), captions.threads(deal, now))
     raise ValueError(unit)
 
 
@@ -104,7 +117,7 @@ def test_reel(deals, now: datetime, out: Path) -> int:
                 detail=meta.ig_reel(env["IG_USER_ID"], page_token, reel, captions.instagram(deal, now), publish=False))
         return 0
     except Exception as ex:
-        log(level="error", msg="reel test failed", error=str(ex))
+        log(level="error", msg="reel test failed", error=public(ex))
         return 6
 
 
@@ -173,9 +186,9 @@ def main(argv: list[str] | None = None) -> int:
             for unit in [u for u in units if u in REEL_UNITS]:
                 units.remove(unit)
                 failed.append(unit)
-                skipped = record_failure(state, deal.id, unit, f"reel render: {ex}", now)
+                skipped = record_failure(state, deal.id, unit, public(f"reel render: {ex}"), now)
                 log(level="error", msg="post failed", channel=unit, deal=deal.id, skipped=skipped,
-                    error=f"reel render: {ex}")
+                    error=public(f"reel render: {ex}"))
             save_state(STATE, state)
 
     if a.dry_run:
@@ -194,9 +207,9 @@ def main(argv: list[str] | None = None) -> int:
             for unit in [u for u in units if u in META_UNITS]:
                 units.remove(unit)
                 failed.append(unit)
-                skipped = record_failure(state, deal.id, unit, f"page token: {ex}", now)
+                skipped = record_failure(state, deal.id, unit, public(f"page token: {ex}"), now)
                 log(level="error", msg="post failed", channel=unit, deal=deal.id, skipped=skipped,
-                    error=f"page token: {ex}")
+                    error=public(f"page token: {ex}"))
             save_state(STATE, state)
     for unit in units:
         try:
@@ -205,8 +218,8 @@ def main(argv: list[str] | None = None) -> int:
             log(msg="posted", channel=unit, deal=deal.id, ref=ref)
         except Exception as ex:  # one channel failing must not block the others
             failed.append(unit)
-            skipped = record_failure(state, deal.id, unit, str(ex), now)
-            log(level="error", msg="post failed", channel=unit, deal=deal.id, skipped=skipped, error=str(ex))
+            skipped = record_failure(state, deal.id, unit, public(ex), now)
+            log(level="error", msg="post failed", channel=unit, deal=deal.id, skipped=skipped, error=public(ex))
         save_state(STATE, state)
     return 1 if failed else 0
 
