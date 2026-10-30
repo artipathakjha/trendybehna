@@ -28,6 +28,10 @@ on:
         description: "Post nothing; only verify the secrets work (run after adding or changing one)"
         type: boolean
         default: false
+      test_reel:
+        description: "Post nothing; render a Reel and upload it unpublished (Instagram) / as a deleted draft (Facebook)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -54,6 +58,8 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Chrome present (renders the cards)
         run: google-chrome --version
+      - name: Install ffmpeg (Reels; not preinstalled on ubuntu-24.04 runners)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null && ffmpeg -version | head -1
       - name: Post next deal
         id: post
         continue-on-error: true
@@ -63,7 +69,8 @@ jobs:
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
-        run: python -m tb.main ${{ inputs.check && '--check-channels' || '' }} ${{ (github.event_name == 'schedule' || inputs.guard) && '--min-gap-hours 3' || '' }} ${{ ((github.event_name == 'schedule' && endsWith(github.event.schedule, ' 14 * * *')) || inputs.ig_feed) && '--ig-feed' || '' }}
+          REELS: "1"
+        run: python -m tb.main ${{ inputs.check && '--check-channels' || '' }} ${{ inputs.test_reel && '--test-reel' || '' }} ${{ (github.event_name == 'schedule' || inputs.guard) && '--min-gap-hours 3' || '' }} ${{ ((github.event_name == 'schedule' && endsWith(github.event.schedule, ' 14 * * *')) || inputs.ig_feed) && '--ig-feed' || '' }}
       - name: Save posting state (rebase onto any newer push, retry)
         if: always()
         run: |

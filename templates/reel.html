@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<title>Trendy Behna reel scene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@500;600;700&family=Tiro+Devanagari+Hindi&display=block" rel="stylesheet">
+<style>
+  /* One 1080x1920 scene of a deal Reel (tb/reel.py joins hook -> product -> cta with ffmpeg).
+     Reels UI covers about the top 250px, the bottom 480px (caption, audio) and a right strip (buttons),
+     so all text sits inside the padded box. Same palette as templates/card.html. */
+  :root { {{THEME}} --gold:#D4A24C; --gold-hi:#F0CF7E; --cream:#FFF6EC; --blush:#FBE4EA; }
+  html, body { margin:0; width:1080px; height:1920px; overflow:hidden; background:var(--deep); }
+  .c { box-sizing:border-box; width:1080px; height:1920px; display:flex; flex-direction:column; align-items:center;
+       justify-content:center; gap:44px; padding:300px 150px 500px 90px; text-align:center;
+       background:radial-gradient(ellipse 90% 55% at 50% 42%, var(--glow) 0%, var(--mid) 42%, var(--edge) 75%, var(--deep) 100%); }
+  /* ASCI: the #ad label must sit in the video itself for the whole Reel, not only in the caption */
+  .tag   { position:absolute; top:270px; left:90px; font-family:'Poppins', sans-serif; font-weight:600; font-size:30px;
+           color:var(--deep); background:var(--blush); padding:8px 22px; border-radius:30px; opacity:.95; }
+  .brand { font-family:'Tiro Devanagari Hindi', serif; font-size:44px; color:var(--gold-hi); }
+  .chip  { font-family:'Poppins', sans-serif; font-weight:700; font-size:34px; letter-spacing:5px; color:var(--deep);
+           background:var(--gold-hi); padding:14px 40px; border-radius:44px; text-transform:uppercase; }
+  .hook  { font-family:'Playfair Display', serif; font-weight:900; font-size:{{HOOK_PX}}px; line-height:1.08;
+           color:var(--cream); text-shadow:0 6px 26px rgba(60,0,25,.5); }
+  .hook b { color:var(--gold-hi); }
+  .title { font-family:'Playfair Display', serif; font-weight:700; font-size:{{TITLE_PX}}px; line-height:1.15;
+           color:var(--cream); text-shadow:0 5px 22px rgba(60,0,25,.45); }
+  .facts { font-family:'Poppins', sans-serif; font-weight:500; font-size:46px; line-height:1.5; color:var(--blush); }
+  .facts b { color:var(--gold-hi); font-weight:700; }
+  .blurb { font-family:'Poppins', sans-serif; font-weight:500; font-size:40px; line-height:1.4; color:var(--cream); opacity:.92; }
+  .store { font-family:'Poppins', sans-serif; font-weight:700; font-size:52px; color:var(--cream);
+           border:4px solid var(--gold); border-radius:26px; padding:22px 46px; }
+  .where { font-family:'Poppins', sans-serif; font-weight:600; font-size:42px; line-height:1.45; color:var(--gold-hi); }
+  .ad    { font-family:'Poppins', sans-serif; font-weight:500; font-size:30px; line-height:1.4; color:var(--blush); opacity:.88; }
+</style>
+</head>
+<body>
+<div class="c">
+{{BODY}}
+</div>
+<div class="tag">{{TAG}}</div>
+</body>
+</html>

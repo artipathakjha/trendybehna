@@ -369,3 +369,105 @@ def test_check_channels_posts_nothing_and_fails_loudly(tmp_path, monkeypatch):
     monkeypatch.setattr(tbmain.telegram, "check", lambda tok, chat: (_ for _ in ()).throw(RuntimeError("401")))
     assert tbmain.main(["--check-channels"]) == 5
     assert not (tmp_path / "posted.json").exists()
+
+
+def test_captions_put_ad_label_first():
+    d = deal()
+    assert captions.facebook(d, NOW).startswith("#ad")
+    assert captions.instagram(d, NOW).startswith("#ad")
+    assert captions.telegram(d, NOW).startswith("#ad")
+
+
+def test_reels_are_opt_in():
+    env = {"FB_PAGE_ID": "1", "FB_PAGE_TOKEN": "t", "IG_USER_ID": "2"}
+    assert "instagram_reel" not in tbmain.enabled_channels(env)
+    assert tbmain.enabled_channels({**env, "REELS": "1"}) == \
+        ["facebook", "instagram", "facebook_reel", "instagram_reel"]
+
+
+def test_reel_scenes_label_ad_and_hide_amazon_price():
+    from tb import reel
+    amz = deal(store="amazon", url="https://www.amazon.in/dp/B0?tag=trendybehna-21")
+    for scene, _ in reel.SCENES:
+        page = reel.scene_html(amz, scene, NOW)
+        assert "#ad" in page and "₹" not in page
+    assert "As an Amazon Associate" in reel.scene_html(amz, "cta", NOW)
+    assert "AI voice" in reel.scene_html(deal(), "hook", NOW, voiced=True)
+    assert "AI voice" not in reel.scene_html(deal(), "hook", NOW)
+    assert "{{" not in reel.scene_html(deal(), "product", NOW)
+
+
+def test_reel_ffmpeg_timeline():
+    from tb import reel
+    pngs = [Path(f"{s}.png") for s, _ in reel.SCENES]
+    args = reel.ffmpeg_args(pngs, [2.6, 3.8, 3.2], Path("out.mp4"), [Path("a.mp3"), Path("b.mp3"), Path("c.mp3")])
+    graph = args[args.index("-filter_complex") + 1]
+    assert "xfade=transition=fade:duration=0.4:offset=2.20" in graph   # 2.6 - 0.4
+    assert "offset=5.60" in graph                                       # 2.6 + 3.8 - 2*0.4
+    assert "adelay=2350|2350" in graph and "amix=inputs=4" in graph     # voice 2 starts with scene 2 (+0.15s)
+    assert args[args.index("-t", args.index("-filter_complex")) + 1] == "8.80"
+    assert "+faststart" in args and "yuv420p" in args
+
+
+def test_meta_reels_upload_sequence(monkeypatch, tmp_path):
+    from tb.channels import meta
+    video = tmp_path / "r.mp4"
+    video.write_bytes(b"x" * 1234)
+    calls = []
+
+    def req(method, url, **kw):
+        calls.append((method, url, kw.get("headers", {}), (kw.get("data") or {}) if isinstance(kw.get("data"), dict) else "BYTES"))
+        if "video_reels" in url and kw["data"]["upload_phase"] == "start":
+            return FakeResp(200, {"video_id": "v1", "upload_url": "https://rupload.facebook.com/video-upload/v1"})
+        if url.endswith("/media"):
+            return FakeResp(200, {"id": "c1"})
+        if url.endswith("/c1"):
+            return FakeResp(200, {"status_code": "FINISHED"})
+        return FakeResp(200, {"success": True, "id": "m1"})
+    monkeypatch.setattr(http.requests, "request", req)
+    assert meta.fb_reel("p", "tok", video, "hi", state="DRAFT") == "v1"
+    up = next(c for c in calls if "rupload" in c[1])
+    assert up[2]["file_size"] == "1234" and up[2]["Authorization"] == "OAuth tok" and up[3] == "BYTES"
+    assert calls[-1][3]["video_state"] == "DRAFT"
+    calls.clear()
+    assert meta.ig_reel("ig", "tok", video, "cap", publish=False).startswith("container c1")
+    assert any("ig-api-upload/v26.0/c1" in c[1] for c in calls)
+    assert not any(c[1].endswith("/media_publish") for c in calls)
+
+
+def test_reel_render_failure_does_not_block_photo_posts(tmp_path, monkeypatch):
+    deals = tmp_path / "deals.yaml"
+    deals.write_text("- {id: d1, store: myntra, title: T, url: 'https://x', category: C}\n", encoding="utf-8")
+    monkeypatch.setattr(tbmain, "DEALS", deals)
+    monkeypatch.setattr(tbmain, "STATE", tmp_path / "posted.json")
+    monkeypatch.setattr(tbmain, "render", lambda d, k, p, n: p)
+    monkeypatch.setattr(tbmain, "render_reel", lambda *a: (_ for _ in ()).throw(RuntimeError("no ffmpeg")))
+    for k in ("TG_BOT_TOKEN", "TG_CHAT", "IG_USER_ID"):
+        monkeypatch.delenv(k, raising=False)
+    monkeypatch.setenv("FB_PAGE_ID", "1")
+    monkeypatch.setenv("FB_PAGE_TOKEN", "t")
+    monkeypatch.setenv("REELS", "1")
+    monkeypatch.setattr(tbmain.meta, "resolve_page_token", lambda page, tok: ("pt", "page"))
+    monkeypatch.setattr(tbmain.meta, "fb_photo", lambda *a: "fb1")
+    assert tbmain.main([]) == 1
+    state = tbmain.load_state(tmp_path / "posted.json")
+    assert state["d1"]["facebook"].endswith("fb1")
+    assert state["d1"]["_fail"]["facebook_reel"] == 1
+
+
+def test_music_is_deterministic_varied_and_safe():
+    np = pytest.importorskip("numpy")
+    from tb import music
+    a, b = music.compose("deal-a", 3.0), music.compose("deal-a", 3.0)
+    c = music.compose("deal-b", 3.0)
+    assert a.shape == (3 * music.SR, 2) and np.array_equal(a, b) and not np.array_equal(a, c)
+    assert float(np.max(np.abs(a))) <= 0.51 and not np.isnan(a).any()
+
+
+def test_reel_music_replaces_silent_bed():
+    from tb import reel
+    pngs = [Path(f"{s}.png") for s, _ in reel.SCENES]
+    with_music = reel.ffmpeg_args(pngs, [2.6, 3.8, 3.2], Path("o.mp4"), music=Path("m.wav"))
+    assert "m.wav" in with_music and "anullsrc=r=48000:cl=stereo" not in with_music
+    voiced = reel.ffmpeg_args(pngs, [2.6, 3.8, 3.2], Path("o.mp4"), [Path("v.mp3")], music=Path("m.wav"))
+    assert "volume=0.35" in voiced[voiced.index("-filter_complex") + 1]  # music ducks under a voice

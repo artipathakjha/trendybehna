@@ -54,11 +54,15 @@ def card_html(deal: Deal, kind: str, now: datetime) -> str:
 
 
 def render(deal: Deal, kind: str, out_png: Path, now: datetime) -> Path:
-    w, h = SIZES[kind]
+    return screenshot(card_html(deal, kind, now), SIZES[kind], out_png)
+
+
+def screenshot(page_html: str, size: tuple[int, int], out_png: Path) -> Path:
+    w, h = size
     out_png = out_png.resolve()  # Chrome resolves relative --screenshot paths against its own cwd
     with tempfile.TemporaryDirectory() as td:
         page = Path(td) / "card.html"
-        page.write_text(card_html(deal, kind, now), encoding="utf-8")
+        page.write_text(page_html, encoding="utf-8")
         # --no-sandbox: GitHub's ubuntu-24.04 runners block Chrome's user-namespace sandbox. Acceptable here because
         # the page is our own template with no JavaScript, every deal field is html-escaped, and the runner is
         # throwaway; never point this at a remote or user-supplied page.

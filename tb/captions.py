@@ -56,7 +56,7 @@ def telegram(deal: Deal, now: datetime) -> str:
     e = html.escape
 
     def build(title: str, blurb: str) -> str:
-        lines = [f"<b>{e(title)}</b>", ""]
+        lines = [f"#ad · <b>{e(title)}</b>", ""]  # ASCI: label upfront, not only after "…more"
         if blurb:
             lines += [e(blurb), ""]
         lines += [e(f) for f in facts(deal, now)]
@@ -78,7 +78,7 @@ def telegram(deal: Deal, now: datetime) -> str:
 
 
 def facebook(deal: Deal, now: datetime) -> str:
-    lines = [deal.title, ""]
+    lines = [f"#ad · {deal.title}", ""]
     if deal.blurb:
         lines += [deal.blurb, ""]
     lines += facts(deal, now)
@@ -88,7 +88,7 @@ def facebook(deal: Deal, now: datetime) -> str:
 
 def instagram(deal: Deal, now: datetime) -> str:
     """Instagram captions cannot hold clickable links; send people to the channels in the bio."""
-    lines = [deal.title, ""]
+    lines = [f"#ad · {deal.title}", ""]
     if deal.blurb:
         lines += [deal.blurb, ""]
     lines += facts(deal, now)

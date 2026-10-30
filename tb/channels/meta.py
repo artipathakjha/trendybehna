@@ -61,6 +61,53 @@ def public_url(page_id: str, token: str, photo: Path) -> str:
     return max(body["images"], key=lambda im: im["width"])["source"]
 
 
+RUPLOAD = "https://rupload.facebook.com"
+
+
+def _upload(url: str, token: str, video: Path) -> None:
+    """Resumable-upload endpoint: the whole file in one request (Reels are a few MB)."""
+    data = video.read_bytes()
+    call("POST", url, secret=token, data=data,
+         headers={"Authorization": f"OAuth {token}", "offset": "0", "file_size": str(len(data))})
+
+
+def fb_reel(page_id: str, token: str, video: Path, description: str, state: str = "PUBLISHED") -> str:
+    """Page Reel: start -> upload bytes -> finish. state=DRAFT keeps it off the Page (used by --test-reel)."""
+    start = call("POST", f"{GRAPH}/{page_id}/video_reels", secret=token,
+                 data={"upload_phase": "start", "access_token": token})
+    _upload(start["upload_url"], token, video)
+    call("POST", f"{GRAPH}/{page_id}/video_reels", secret=token,
+         data={"upload_phase": "finish", "video_id": start["video_id"], "video_state": state,
+               "description": description, "access_token": token})
+    return start["video_id"]
+
+
+def delete(object_id: str, token: str) -> None:
+    call("DELETE", f"{GRAPH}/{object_id}", secret=token, params={"access_token": token})
+
+
+def ig_reel(ig_user: str, token: str, video: Path, caption: str, publish: bool = True) -> str:
+    """Instagram Reel by resumable upload (no public URL needed). Video processing takes longer than images,
+    so the container is polled for up to 5 minutes. publish=False stops at a ready container (expires in 24h)."""
+    cid = call("POST", f"{GRAPH}/{ig_user}/media", secret=token,
+               data={"media_type": "REELS", "upload_type": "resumable", "caption": caption,
+                     "share_to_feed": "true", "access_token": token})["id"]
+    _upload(f"{RUPLOAD}/ig-api-upload/v26.0/{cid}", token, video)
+    for _ in range(60):
+        st = call("GET", f"{GRAPH}/{cid}", secret=token, params={"fields": "status_code", "access_token": token})
+        if st.get("status_code") == "FINISHED":
+            break
+        if st.get("status_code") in ("ERROR", "EXPIRED"):
+            raise ApiError(f"instagram reel container {cid} failed: {st}".replace(token, "***"))
+        time.sleep(5)
+    else:
+        raise ApiError(f"instagram reel container {cid} not ready after 5 min".replace(token, "***"))
+    if not publish:
+        return f"container {cid} ready (not published)"
+    return call("POST", f"{GRAPH}/{ig_user}/media_publish", secret=token,
+                data={"creation_id": cid, "access_token": token})["id"]
+
+
 def ig_publish(ig_user: str, token: str, image_url: str, caption: str | None, story: bool) -> str:
     data = {"image_url": image_url, "access_token": token}
     if story:
