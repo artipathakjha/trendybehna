@@ -1,0 +1,41 @@
+name: refresh-threads-token
+
+# The Threads token lasts 60 days; renewing it weekly keeps it alive forever with nobody touching it.
+# The new token is piped from tb.threads_token straight into `gh secret set`, so it never appears in this
+# (public) log. SECRETS_PAT: fine-grained token on this repo only, permission "Secrets: Read and write".
+on:
+  schedule:
+    - cron: "17 3 * * 0"   # Sundays 08:47 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # pinned to commit SHAs: this job holds the Threads token and a secrets-write token
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      # Two steps so the Python process that calls Threads never has the secrets-write token in its environment.
+      - name: Renew the Threads token
+        env:
+          THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+        run: |
+          # bash -e: a failed renewal stops here, before anything is saved
+          python -m tb.threads_token > "$RUNNER_TEMP/threads_token"
+          [ -s "$RUNNER_TEMP/threads_token" ] || { echo "::error::Threads returned an empty token; nothing saved"; exit 1; }
+          echo "::add-mask::$(cat "$RUNNER_TEMP/threads_token")"
+      - name: Save it as the THREADS_TOKEN secret (fails, and GitHub emails the owner, if SECRETS_PAT is missing)
+        env:
+          GH_TOKEN: ${{ secrets.SECRETS_PAT }}
+        run: |
+          gh secret set THREADS_TOKEN --repo "${GITHUB_REPOSITORY}" < "$RUNNER_TEMP/threads_token"
+          rm -f "$RUNNER_TEMP/threads_token"
+          echo "THREADS_TOKEN renewed and saved"

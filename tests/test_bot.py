@@ -526,3 +526,19 @@ def test_errors_written_to_public_log_and_state_carry_no_urls():
     msg = tbmain.public(RuntimeError("threads container c1 failed: {'error_message': "
                                      "'cannot fetch https://scontent.xx.fbcdn.net/v/t39/p.png?oh=ab&oe=cd'}"))
     assert "fbcdn" not in msg and "[url]" in msg
+
+
+def test_threads_token_refresh_prints_only_the_new_token(monkeypatch, capsys):
+    from tb import threads_token
+    seen = {}
+
+    def req(method, url, **kw):
+        seen["url"], seen["params"] = url, kw.get("params")
+        return FakeResp(200, {"access_token": "NEWTOKEN", "token_type": "bearer", "expires_in": 5184000})
+    monkeypatch.setattr(http.requests, "request", req)
+    monkeypatch.setenv("THREADS_TOKEN", "OLDTOKEN")
+    assert threads_token.main() == 0
+    out, err = capsys.readouterr()
+    assert out == "NEWTOKEN" and "60 more days" in err and "NEWTOKEN" not in err
+    assert seen["url"] == "https://graph.threads.net/refresh_access_token"
+    assert seen["params"]["grant_type"] == "th_refresh_token"
