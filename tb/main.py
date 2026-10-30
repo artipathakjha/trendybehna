@@ -5,7 +5,8 @@ Channels turn on when their secrets are set:
   telegram:  TG_BOT_TOKEN, TG_CHAT (e.g. @trendybehna)
   facebook:  FB_PAGE_ID, FB_PAGE_TOKEN
   instagram: FB_PAGE_ID, FB_PAGE_TOKEN, IG_USER_ID   (Story; --ig-feed adds a best-effort feed post)
-  reels:     REELS=1 adds facebook_reel / instagram_reel (needs ffmpeg; see tb/reel.py)
+  reels:     REELS=1 adds facebook_reel / instagram_reel (needs ffmpeg; see tb/reel.py);
+             REEL_MUSIC=1 adds the per-deal original music from tb/music.py (needs numpy)
 State is saved after every post or failure, so a rerun never double-posts, and a channel that keeps
 failing is skipped for that deal after MAX_FAILS attempts instead of blocking the queue.
 """
@@ -92,7 +93,7 @@ def test_reel(deals, now: datetime, out: Path) -> int:
     24h) and to the Facebook Page as a draft that is then deleted. Proves the whole video pipeline end to end."""
     env, deal = os.environ, deals[0]
     try:
-        reel = render_reel(deal, out / f"{deal.id}_reel.mp4", now)
+        reel = render_reel(deal, out / f"{deal.id}_reel.mp4", now, music=env.get("REEL_MUSIC") == "1")
         log(msg="reel rendered", deal=deal.id, mb=round(reel.stat().st_size / 1e6, 2))
         page_token, _ = meta.resolve_page_token(env["FB_PAGE_ID"], env["FB_PAGE_TOKEN"])
         vid = meta.fb_reel(env["FB_PAGE_ID"], page_token, reel, captions.facebook(deal, now), state="DRAFT")
@@ -167,7 +168,7 @@ def main(argv: list[str] | None = None) -> int:
     failed, page_token, reel = [], None, None
     if REEL_UNITS & set(units) and not a.dry_run:
         try:
-            reel = render_reel(deal, out / f"{deal.id}_reel.mp4", now)
+            reel = render_reel(deal, out / f"{deal.id}_reel.mp4", now, music=os.environ.get("REEL_MUSIC") == "1")
         except Exception as ex:  # a video problem must not stop the photo posts
             for unit in [u for u in units if u in REEL_UNITS]:
                 units.remove(unit)
