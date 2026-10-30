@@ -89,6 +89,20 @@
   - festive
   - myntra
   - trendybehna
+- id: amazon-B01MU6O7H7
+  store: amazon
+  title: YouBella Bohemian Multi-Color Earrings
+  category: Earrings
+  blurb: Rang-birange boho earrings, kurti aur western dono ke saath.
+  url: https://www.amazon.in/dp/B01MU6O7H7?tag=trendybehna-21
+  rating: 4.1
+  ratings_count: 8862
+  checked_at: &id003 2026-10-30 08:45:00+00:00
+  tags:
+  - earrings
+  - boho
+  - amazon
+  - trendybehna
 - id: myntra-19674622
   store: myntra
   title: Libas Peach Floral Kurta with Trousers & Dupatta
@@ -158,6 +172,21 @@
   - daily
   - myntra
   - trendybehna
+- id: amazon-B08L13PPNS
+  store: amazon
+  title: Shining Diva Antique Kundan Choker Necklace Set
+  category: Jewellery
+  blurb: Antique kundan choker set, saree aur lehenga ke saath shaadi season ke liye.
+  url: https://www.amazon.in/dp/B08L13PPNS?tag=trendybehna-21
+  rating: 4.0
+  ratings_count: 3813
+  checked_at: *id003
+  tags:
+  - jewellery
+  - kundan
+  - choker
+  - amazon
+  - trendybehna
 - id: myntra-34335028
   store: myntra
   title: Zaveri Pearls Set of 2 Gold-Plated Stone Studded Jewellery Sets
@@ -209,6 +238,21 @@
   - palazzo
   - embroidered
   - myntra
+  - trendybehna
+- id: amazon-B091MK45DB
+  store: amazon
+  title: Shining Diva Rose Gold Austrian Crystal Bracelet
+  category: Bracelet
+  blurb: Rose gold crystal bracelet, roz pehenne aur gift dene dono ke liye.
+  url: https://www.amazon.in/dp/B091MK45DB?tag=trendybehna-21
+  rating: 4.1
+  ratings_count: 2805
+  checked_at: *id003
+  tags:
+  - bracelet
+  - rosegold
+  - gift
+  - amazon
   - trendybehna
 - id: myntra-29235468
   store: myntra
@@ -277,6 +321,21 @@
   - necklace
   - jhumka
   - myntra
+  - trendybehna
+- id: amazon-B078KWDF1N
+  store: amazon
+  title: Shining Diva Royal Blue Crystal CZ Silver Plated Bracelet
+  category: Bracelet
+  blurb: Royal blue crystal bracelet, party look ke liye chamakdaar touch.
+  url: https://www.amazon.in/dp/B078KWDF1N?tag=trendybehna-21
+  rating: 4.0
+  ratings_count: 2272
+  checked_at: *id003
+  tags:
+  - bracelet
+  - crystal
+  - party
+  - amazon
   - trendybehna
 - id: myntra-39187946
   store: myntra
