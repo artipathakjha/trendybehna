@@ -12,7 +12,7 @@ from .deals import Deal, first_posted, load_deals, load_state
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "templates" / "site.html"
-SITE_URL = "https://artipathakjha.github.io/trendybehna-bot/"
+SITE_URL = "https://artipathakjha.github.io/trendybehna/"
 MAX_DEALS = 30
 IST = timezone(timedelta(hours=5, minutes=30))
 # Only profiles verified as Trendy Behna's own (see the accounts memory); never add one that is not live and ours.
