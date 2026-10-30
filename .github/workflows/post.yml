@@ -61,3 +61,11 @@ jobs:
       - name: Fail the run if posting failed (GitHub emails the repo owner)
         if: steps.post.outcome == 'failure'
         run: exit 1
+      - name: Queue running low? (fails with fewer than 6 deals left, about 2 days, so GitHub emails a refill warning)
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python -m tb.main --check-queue 6

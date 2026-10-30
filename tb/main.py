@@ -67,6 +67,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="render cards and print captions; no API calls")
     ap.add_argument("--ig-feed", action="store_true", help="also publish an Instagram feed post (default: Story only)")
     ap.add_argument("--out", type=Path, help="keep rendered cards in this folder")
+    ap.add_argument("--check-queue", type=int, metavar="N",
+                    help="post nothing; exit 4 if fewer than N deals are still waiting (early refill warning)")
     a = ap.parse_args(argv)
     sys.stdout.reconfigure(encoding="utf-8")  # ₹ and emoji in JSON logs on any console
 
@@ -76,6 +78,13 @@ def main(argv: list[str] | None = None) -> int:
         log(level="error", msg="no channels configured")
         return 2
     deals, state = load_deals(DEALS), load_state(STATE)
+    if a.check_queue is not None:
+        waiting = sum(any(needs(state, d.id, ch) for ch in channels) for d in deals)
+        log(msg="queue check", waiting=waiting, minimum=a.check_queue)
+        if waiting < a.check_queue:
+            log(level="error", msg=f"deal queue running low: {waiting} left (about {waiting / 3:.1f} days); add deals")
+            return 4
+        return 0
     if not a.dry_run:
         register_channels(state, channels, now)
     deal = next_deal(deals, state, channels)

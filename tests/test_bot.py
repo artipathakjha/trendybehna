@@ -238,6 +238,23 @@ def test_instagram_story_and_feed_are_separate_units(tmp_path, monkeypatch):
     assert len(stories) == 1                                        # story never re-published
 
 
+def test_check_queue_warns_when_low(tmp_path, monkeypatch):
+    deals = tmp_path / "deals.yaml"
+    deals.write_text("".join(f"- {{id: d{i}, store: myntra, title: T, url: 'https://x', category: C}}\n"
+                             for i in range(3)), encoding="utf-8")
+    state = tmp_path / "posted.json"
+    state.write_text('{"d0": {"telegram": "2026-10-30T04:00:00+00:00 1"}}', encoding="utf-8")
+    monkeypatch.setattr(tbmain, "DEALS", deals)
+    monkeypatch.setattr(tbmain, "STATE", state)
+    monkeypatch.setenv("TG_BOT_TOKEN", "t")
+    monkeypatch.setenv("TG_CHAT", "@c")
+    for k in ("FB_PAGE_ID", "FB_PAGE_TOKEN", "IG_USER_ID"):
+        monkeypatch.delenv(k, raising=False)
+    assert tbmain.main(["--check-queue", "2"]) == 0   # d1, d2 waiting
+    assert tbmain.main(["--check-queue", "3"]) == 4   # fewer than 3 waiting
+    assert "telegram" in state.read_text() and "_channels" not in state.read_text()  # check never writes state
+
+
 def test_resolve_page_token_accepts_page_token(monkeypatch):
     from tb.channels import meta
     monkeypatch.setattr(meta, "call", lambda m, url, **k: {"id": "111"})
