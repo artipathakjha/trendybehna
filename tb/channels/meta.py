@@ -11,6 +11,19 @@ from ..http import ApiError, call
 GRAPH = "https://graph.facebook.com/v26.0"
 
 
+def resolve_page_token(page_id: str, token: str) -> tuple[str, str]:
+    """Posting needs a PAGE token. If FB_PAGE_TOKEN holds the admin's user token instead, derive the Page token
+    from it (works while the user token is valid, ~60 days); a token minted for the Page itself never expires.
+    Returns (page_token, kind) where kind is "page" or "derived-from-user"."""
+    me = call("GET", f"{GRAPH}/me", secret=token, params={"fields": "id", "access_token": token})
+    if me.get("id") == page_id:
+        return token, "page"
+    body = call("GET", f"{GRAPH}/{page_id}", secret=token, params={"fields": "access_token", "access_token": token})
+    if "access_token" not in body:
+        raise ApiError(f"token cannot manage page {page_id}: no page access_token returned")
+    return body["access_token"], "derived-from-user"
+
+
 def fb_photo(page_id: str, token: str, photo: Path, message: str, published: bool = True) -> str:
     data = {"message": message, "published": str(published).lower(), "access_token": token}
     if not published:

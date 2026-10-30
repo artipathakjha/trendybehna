@@ -44,14 +44,17 @@ def enabled_channels(env=os.environ) -> list[str]:
     return ch
 
 
-def publish(unit: str, deal, feed: Path, story: Path | None, now: datetime) -> str:
+META_UNITS = {"facebook", "instagram", "instagram_feed"}
+
+
+def publish(unit: str, deal, feed: Path, story: Path | None, now: datetime, page_token: str | None) -> str:
     env = os.environ
     if unit == "telegram":
         return telegram.post(env["TG_BOT_TOKEN"], env["TG_CHAT"], feed, captions.telegram(deal, now),
                              captions.cta(deal), deal.url)
     if unit == "facebook":
-        return meta.fb_photo(env["FB_PAGE_ID"], env["FB_PAGE_TOKEN"], feed, captions.facebook(deal, now))
-    page, tok, ig = env["FB_PAGE_ID"], env["FB_PAGE_TOKEN"], env["IG_USER_ID"]
+        return meta.fb_photo(env["FB_PAGE_ID"], page_token, feed, captions.facebook(deal, now))
+    page, tok, ig = env["FB_PAGE_ID"], page_token, env["IG_USER_ID"]
     if unit == "instagram":
         return meta.ig_publish(ig, tok, meta.public_url(page, tok, story), None, story=True)
     if unit == "instagram_feed":
@@ -96,10 +99,24 @@ def main(argv: list[str] | None = None) -> int:
         log(msg="dry-run cards", feed=str(feed), story=str(story))
         return 0
 
-    failed = []
+    failed, page_token = [], None
+    if META_UNITS & set(units):
+        try:
+            page_token, kind = meta.resolve_page_token(os.environ["FB_PAGE_ID"], os.environ["FB_PAGE_TOKEN"])
+            log(msg="meta token", kind=kind,
+                **({"warning": "FB_PAGE_TOKEN is a user token (expires); store the Page token for no expiry"}
+                   if kind != "page" else {}))
+        except Exception as ex:
+            for unit in [u for u in units if u in META_UNITS]:
+                units.remove(unit)
+                failed.append(unit)
+                skipped = record_failure(state, deal.id, unit, f"page token: {ex}", now)
+                log(level="error", msg="post failed", channel=unit, deal=deal.id, skipped=skipped,
+                    error=f"page token: {ex}")
+            save_state(STATE, state)
     for unit in units:
         try:
-            ref = publish(unit, deal, feed, story, now)
+            ref = publish(unit, deal, feed, story, now, page_token)
             state.setdefault(deal.id, {})[unit] = f"{datetime.now(timezone.utc).isoformat(timespec='seconds')} {ref}"
             log(msg="posted", channel=unit, deal=deal.id, ref=ref)
         except Exception as ex:  # one channel failing must not block the others

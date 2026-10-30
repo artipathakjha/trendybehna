@@ -191,6 +191,7 @@ def test_main_saves_state_per_channel_and_skips_done(tmp_path, monkeypatch):
     monkeypatch.setenv("FB_PAGE_TOKEN", "t")
     monkeypatch.delenv("IG_USER_ID", raising=False)
     sent = []
+    monkeypatch.setattr(tbmain.meta, "resolve_page_token", lambda page, tok: ("pt", "page"))
     monkeypatch.setattr(tbmain.telegram, "post", lambda *a: sent.append("tg") or "11")
 
     def fb_fail(*a):
@@ -219,6 +220,7 @@ def test_instagram_story_and_feed_are_separate_units(tmp_path, monkeypatch):
     monkeypatch.setenv("FB_PAGE_ID", "1")
     monkeypatch.setenv("FB_PAGE_TOKEN", "t")
     monkeypatch.setenv("IG_USER_ID", "2")
+    monkeypatch.setattr(tbmain.meta, "resolve_page_token", lambda page, tok: ("pt", "page"))
     monkeypatch.setattr(tbmain.meta, "fb_photo", lambda *a: "fb1")
     monkeypatch.setattr(tbmain.meta, "public_url", lambda *a: "https://cdn/x.png")
     stories = []
@@ -234,3 +236,38 @@ def test_instagram_story_and_feed_are_separate_units(tmp_path, monkeypatch):
     assert "instagram" in s["a"] and "instagram_feed" not in s["a"]
     assert tbmain.main(["--out", str(tmp_path), "--ig-feed"]) == 3  # deal complete for required channels
     assert len(stories) == 1                                        # story never re-published
+
+
+def test_resolve_page_token_accepts_page_token(monkeypatch):
+    from tb.channels import meta
+    monkeypatch.setattr(meta, "call", lambda m, url, **k: {"id": "111"})
+    assert meta.resolve_page_token("111", "PAGE") == ("PAGE", "page")
+
+
+def test_resolve_page_token_derives_from_user_token(monkeypatch):
+    from tb.channels import meta
+    def fake(m, url, **k):
+        return {"id": "999"} if url.endswith("/me") else {"access_token": "DERIVED", "id": "111"}
+    monkeypatch.setattr(meta, "call", fake)
+    assert meta.resolve_page_token("111", "USER") == ("DERIVED", "derived-from-user")
+
+
+def test_bad_page_token_fails_meta_units_but_telegram_still_posts(tmp_path, monkeypatch):
+    import json
+    deals = tmp_path / "deals.yaml"
+    deals.write_text("- {id: a, store: myntra, title: T, url: 'https://myntr.it/x', category: Saree}\n",
+                     encoding="utf-8")
+    state = tmp_path / "posted.json"
+    monkeypatch.setattr(tbmain, "DEALS", deals)
+    monkeypatch.setattr(tbmain, "STATE", state)
+    monkeypatch.setattr(tbmain, "render", lambda d, k, p, n: p)
+    for k, v in {"TG_BOT_TOKEN": "t", "TG_CHAT": "@c", "FB_PAGE_ID": "1", "FB_PAGE_TOKEN": "bad", "IG_USER_ID": "2"}.items():
+        monkeypatch.setenv(k, v)
+    def boom(page, tok):
+        raise http.ApiError("HTTP 400: invalid token")
+    monkeypatch.setattr(tbmain.meta, "resolve_page_token", boom)
+    monkeypatch.setattr(tbmain.telegram, "post", lambda *a: "11")
+    assert tbmain.main(["--out", str(tmp_path)]) == 1
+    s = json.loads(state.read_text())
+    assert "telegram" in s["a"]
+    assert s["a"]["_fail"] == {"facebook": 1, "instagram": 1}
