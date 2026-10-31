@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -45,6 +46,17 @@ class Deal:
         return None
 
 
+SITE_URL = "https://artipathakjha.github.io/trendybehna/"
+SAFE_ID = re.compile(r"[A-Za-z0-9-]+")  # deal ids become page file names and URL paths
+
+
+def page_url(deal: Deal) -> str:
+    """Permanent page for one deal on our site (tb/site.py builds it). Pins, Facebook and Threads posts link here,
+    not to the store short link: Pinterest refuses some shorteners, and Instagram restricted our links on
+    2026-10-30 as possibly deceptive, so Meta posts send people to our own disclosed page first."""
+    return f"{SITE_URL}d/{deal.id}.html"
+
+
 MAX_FAILS = 3  # after this many failed attempts a (deal, channel) is marked skipped so the queue keeps moving
 
 
@@ -67,6 +79,8 @@ def load_deals(path: Path) -> list[Deal]:
             raise ValueError(f"duplicate deal id {d['id']!r}")
         if str(d["id"]).startswith("_"):
             raise ValueError(f"deal id {d['id']!r}: ids starting with '_' are reserved for state metadata")
+        if not SAFE_ID.fullmatch(str(d["id"])):
+            raise ValueError(f"deal id {d['id']!r}: only letters, digits and '-' (it becomes a file name and URL)")
         if not str(d["url"]).startswith("https://"):
             raise ValueError(f"deal {d['id']}: url must be https")
         seen.add(d["id"])

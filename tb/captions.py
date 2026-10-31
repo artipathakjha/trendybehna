@@ -8,7 +8,7 @@ from __future__ import annotations
 import html
 from datetime import datetime, timedelta
 
-from .deals import Deal
+from .deals import Deal, page_url
 
 PRICE_FRESH = timedelta(hours=24)
 WA_CHANNEL = "https://whatsapp.com/channel/0029VbDUg6xFnSzI6HUqs71y"
@@ -78,11 +78,12 @@ def telegram(deal: Deal, now: datetime) -> str:
 
 
 def facebook(deal: Deal, now: datetime) -> str:
+    """Links the deal's page on our site, not the store (see deals.page_url)."""
     lines = [f"#ad · {deal.title}", ""]
     if deal.blurb:
         lines += [deal.blurb, ""]
     lines += facts(deal, now)
-    lines += ["", f"👉 {cta(deal)}: {deal.url}", "", f"Roz ki deals: WhatsApp {WA_CHANNEL}", "", footer(deal)]
+    lines += ["", f"👉 {cta(deal)}: {page_url(deal)}", "", f"Roz ki deals: Telegram {TG_CHANNEL}", "", footer(deal)]
     return "\n".join(lines).replace("\n\n\n", "\n\n")
 
 
@@ -92,7 +93,7 @@ def instagram(deal: Deal, now: datetime) -> str:
     if deal.blurb:
         lines += [deal.blurb, ""]
     lines += facts(deal, now)
-    lines += ["", "Link: bio mein WhatsApp / Telegram channel 👆", "", footer(deal)]
+    lines += ["", "Link: bio mein website / Telegram channel 👆", "", footer(deal)]
     tags = " ".join(f"#{t}" for t in deal.tags[:8])
     return "\n".join(lines + ([tags] if tags else [])).replace("\n\n\n", "\n\n")
 
@@ -130,14 +131,15 @@ THREADS_MAX = 500  # Threads rejects longer post text
 
 
 def threads(deal: Deal, now: datetime) -> str:
-    """Plain text; the URL is clickable on Threads. Shortens the blurb, then the title, to stay within 500 chars;
-    the #ad label, the link and the disclosure are never cut."""
+    """Plain text; the URL is clickable on Threads and is the deal's page on our site (see deals.page_url).
+    Shortens the blurb, then the title, to stay within 500 chars; the #ad label, the link and the disclosure are
+    never cut."""
     def build(title: str, blurb: str) -> str:
         lines = [f"#ad · {title}", ""]
         if blurb:
             lines += [blurb, ""]
         lines += facts(deal, now)
-        lines += ["", f"👉 {cta(deal)}: {deal.url}", "", footer(deal)]
+        lines += ["", f"👉 {cta(deal)}: {page_url(deal)}", "", footer(deal)]
         return "\n".join(lines).replace("\n\n\n", "\n\n")
 
     title, blurb = deal.title, deal.blurb

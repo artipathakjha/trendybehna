@@ -26,11 +26,11 @@ from pathlib import Path
 
 from . import captions
 from .channels import meta, pinterest, telegram, threads
-from .deals import (last_post_time, load_deals, load_state, needs, next_deal, record_failure, register_channels,
-                    save_state)
+from .deals import (last_post_time, load_deals, load_state, needs, next_deal, page_url, record_failure,
+                    register_channels, save_state)
+from .http import call
 from .reel import render_reel
 from .render import render
-from .site import page_url
 
 ROOT = Path(__file__).resolve().parent.parent
 DEALS = ROOT / "deals.yaml"
@@ -86,9 +86,20 @@ def check_channels(channels: list[str]) -> int:
     return 5 if failed else 0
 
 
+LINK_UNITS = {"facebook", "facebook_reel", "threads"}  # their captions link the deal's page on our site
+
+
+def page_live(deal) -> None:
+    """Meta fetches a link's preview when the post goes out, so a deal page that is not deployed yet would go out,
+    and be cached, as a broken link. Raises instead; the unit is retried next run, after the pages job deployed."""
+    call("HEAD", page_url(deal), secret="", attempts=2)
+
+
 def publish(unit: str, deal, feed: Path, story: Path | None, now: datetime, page_token: str | None,
             reel: Path | None = None) -> str:
     env = os.environ
+    if unit in LINK_UNITS:
+        page_live(deal)
     if unit == "telegram":
         return telegram.post(env["TG_BOT_TOKEN"], env["TG_CHAT"], feed, captions.telegram(deal, now),
                              captions.cta(deal), deal.url)

@@ -6,7 +6,7 @@ import pytest
 
 from tb import captions, http
 from tb import main as tbmain
-from tb.deals import MAX_FAILS, Deal, load_deals, needs, next_deal, record_failure
+from tb.deals import MAX_FAILS, Deal, load_deals, needs, next_deal, page_url, record_failure
 
 NOW = datetime(2026, 10, 30, 12, 0, tzinfo=timezone.utc)
 
@@ -20,6 +20,12 @@ def deal(**kw):
 
 
 ALL = [captions.telegram, captions.facebook, captions.instagram]
+
+
+@pytest.fixture(autouse=True)
+def _deal_pages_live(monkeypatch):
+    """Posting tests mock the channels; the live-page check would otherwise reach the real site."""
+    monkeypatch.setattr(tbmain, "page_live", lambda deal: None)
 
 
 @pytest.mark.parametrize("fn", ALL)
@@ -96,6 +102,9 @@ def test_load_deals_validates(tmp_path: Path):
         load_deals(p)
     p.write_text("- {id: a, store: myntra, title: T, url: 'http://x', category: C}\n", encoding="utf-8")
     with pytest.raises(ValueError, match="https"):
+        load_deals(p)
+    p.write_text("- {id: 'a/../b', store: myntra, title: T, url: 'https://x', category: C}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="only letters"):
         load_deals(p)
 
 
@@ -524,9 +533,33 @@ def test_threads_caption_fits_and_keeps_label_link_and_statement():
     amz = deal(store="amazon", url="https://www.amazon.in/dp/B0?tag=trendybehna-21", title="T" * 300, blurb="B" * 400)
     text = captions.threads(amz, NOW)
     assert len(text) <= captions.THREADS_MAX and text.startswith("#ad")
-    assert "https://www.amazon.in/dp/B0?tag=trendybehna-21" in text and captions.AMAZON_STATEMENT in text
+    assert page_url(amz) in text and captions.AMAZON_STATEMENT in text
     assert "₹" not in text
-    assert "https://myntr.it/x" in captions.threads(deal(), NOW)
+    assert page_url(deal()) in captions.threads(deal(), NOW)
+
+
+def test_meta_link_captions_point_to_our_deal_page_not_the_store():
+    # Instagram restricted @trendybehna's links on 2026-10-30; Facebook and Threads link our own disclosed page
+    for d in (deal(), deal(store="amazon", url="https://www.amazon.in/dp/B0?tag=trendybehna-21")):
+        for text in (captions.facebook(d, NOW), captions.threads(d, NOW)):
+            assert page_url(d) in text and d.url not in text and "whatsapp.com" not in text
+    assert captions.TG_CHANNEL in captions.facebook(deal(), NOW)
+    assert "https://myntr.it/x" in captions.telegram(deal(), NOW)  # Telegram keeps the direct store link
+
+
+def test_link_units_wait_for_the_deal_page(monkeypatch, tmp_path):
+    seen = []
+    monkeypatch.undo()  # the real page_live, not the autouse no-op
+    monkeypatch.setattr(tbmain, "call", lambda m, u, **k: seen.append((m, u)) or (_ for _ in ()).throw(
+        http.ApiError("HTTP 404")))
+    monkeypatch.setenv("FB_PAGE_ID", "1")
+    monkeypatch.setattr(tbmain.meta, "fb_photo", lambda *a: pytest.fail("posted before the page was live"))
+    with pytest.raises(http.ApiError):
+        tbmain.publish("facebook", deal(id="myntra-7"), tmp_path / "f.png", None, NOW, "pt")
+    assert seen == [("HEAD", page_url(deal(id="myntra-7")))]
+    monkeypatch.setattr(tbmain, "call", lambda m, u, **k: seen.append((m, u)) or {})
+    monkeypatch.setattr(tbmain.meta, "fb_photo", lambda *a: "fb1")
+    assert tbmain.publish("facebook", deal(id="myntra-7"), tmp_path / "f.png", None, NOW, "pt") == "fb1"
 
 
 def test_threads_channel_needs_its_token():

@@ -3,19 +3,16 @@ Rebuilt by the workflow after every run and served by GitHub Pages.  usage: pyth
 from __future__ import annotations
 
 import html
-import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .captions import WA_CHANNEL, cta, fmt_count, show_price
-from .deals import Deal, first_posted, load_deals, load_state
+from .deals import SAFE_ID, SITE_URL, Deal, first_posted, load_deals, load_state, page_url
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "templates" / "site.html"
-SITE_URL = "https://artipathakjha.github.io/trendybehna/"
 MAX_DEALS = 30
-SAFE_ID = re.compile(r"[A-Za-z0-9-]+")
 INDEX_TITLE = "Trendy Behna: aaj ke fashion aur jewellery deals"
 INDEX_DESC = ("Saree, kurta set, earrings aur jewellery ke checked deals: Myntra, Amazon aur aur bhi stores. "
               "Har link affiliate hai, aapka price same rehta hai.")
@@ -88,11 +85,6 @@ def build(deals: list[Deal], state: dict, now: datetime) -> str:
     posted = sorted(((t, d) for t, d in posted if t), key=lambda td: td[0], reverse=True)[:MAX_DEALS]
     body = "\n".join(deal_html(d, now, link=True) for _, d in posted) or '<p class="facts">Naye deals jaldi aa rahe hain.</p>'
     return _page(body, INDEX_TITLE, INDEX_DESC, SITE_URL, "", now)
-
-
-def page_url(deal: Deal) -> str:
-    """Permanent page for one deal: what a pin links to (Pinterest may refuse store short links like myntr.it)."""
-    return f"{SITE_URL}d/{deal.id}.html"
 
 
 def deal_page(deal: Deal, now: datetime) -> str:

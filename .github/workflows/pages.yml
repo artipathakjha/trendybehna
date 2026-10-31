@@ -1,0 +1,43 @@
+name: pages
+
+# Rebuilds the deals site as soon as new deals or site code are pushed, so a new deal's page (d/<id>.html) is live
+# BEFORE its first post: Facebook, Threads and Pinterest posts link to that page, and the post job refuses to post
+# while it is missing. post.yml also rebuilds the site after every posting run.
+on:
+  push:
+    branches: [main]
+    paths: [deals.yaml, templates/**, tb/site.py, tb/deals.py, tb/captions.py]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pages:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    concurrency:
+      group: pages-deploy  # shared with post.yml's pages job: one deployment at a time
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ github.ref }}  # branch tip, so the page includes the latest posting state
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m tb.site _site
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # v5.0.1
