@@ -50,14 +50,16 @@ SOCIAL = [("WhatsApp channel", WA_CHANNEL), ("Telegram", "https://t.me/trendybeh
           ("Instagram", "https://www.instagram.com/trendybehna/"), ("Facebook", "https://www.facebook.com/trendybehna")]
 
 
-def deal_html(deal: Deal, now: datetime) -> str:
+def deal_html(deal: Deal, now: datetime, link: bool = False) -> str:
+    """link: the title links to the deal's own page (on the index, so search engines find the deal pages)."""
     e = html.escape
     facts = []
     if show_price(deal, now):
         facts.append(f"<b>₹{deal.price:,}</b>" + (f" · {deal.discount_pct}% off" if deal.discount_pct else ""))
     if deal.rating and deal.ratings_count:
         facts.append(f"<b>{deal.rating}★</b> ({fmt_count(deal.ratings_count)} ratings)")
-    out = [f'<article class="deal"><span class="chip">{e(deal.category)}</span>', f"<h2>{e(deal.title)}</h2>"]
+    title = f'<a href="{e(page_url(deal))}">{e(deal.title)}</a>' if link else e(deal.title)
+    out = [f'<article class="deal"><span class="chip">{e(deal.category)}</span>', f"<h2>{title}</h2>"]
     if facts:
         out.append(f'<p class="facts">{" · ".join(facts)}</p>')
     if deal.blurb:
@@ -84,7 +86,7 @@ def _page(body: str, title: str, desc: str, canonical: str, more: str, now: date
 def build(deals: list[Deal], state: dict, now: datetime) -> str:
     posted = [(first_posted(state.get(d.id, {})), d) for d in deals]
     posted = sorted(((t, d) for t, d in posted if t), key=lambda td: td[0], reverse=True)[:MAX_DEALS]
-    body = "\n".join(deal_html(d, now) for _, d in posted) or '<p class="facts">Naye deals jaldi aa rahe hain.</p>'
+    body = "\n".join(deal_html(d, now, link=True) for _, d in posted) or '<p class="facts">Naye deals jaldi aa rahe hain.</p>'
     return _page(body, INDEX_TITLE, INDEX_DESC, SITE_URL, "", now)
 
 
@@ -104,6 +106,15 @@ def privacy_page(now: datetime) -> str:
                  f"{SITE_URL}privacy.html", f'<p class="more"><a href="{SITE_URL}">Aaj ke deals</a></p>', now)
 
 
+def sitemap(deals: list[Deal], now: datetime) -> str:
+    """Every page we serve, for Google Search Console. A deal page's lastmod is when its deal was checked: its real
+    content. Served under /trendybehna/, so it may only list pages under it (all of ours are)."""
+    rows = [(SITE_URL, now), (f"{SITE_URL}privacy.html", None)] + [(page_url(d), d.checked_at) for d in deals]
+    urls = "".join(f"<url><loc>{html.escape(u)}</loc>" + (f"<lastmod>{t:%Y-%m-%d}</lastmod>" if t else "") + "</url>\n"
+                   for u, t in rows)
+    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
+
+
 def main(argv: list[str]) -> int:
     out = Path(argv[0])
     (out / "d").mkdir(parents=True, exist_ok=True)
@@ -112,12 +123,13 @@ def main(argv: list[str]) -> int:
     page = build(deals, load_state(ROOT / "state" / "posted.json"), now)
     (out / "index.html").write_text(page, encoding="utf-8")
     (out / "privacy.html").write_text(privacy_page(now), encoding="utf-8")
+    (out / "sitemap.xml").write_text(sitemap(deals, now), encoding="utf-8")
     # every deal in the queue, posted or not, so a pin's page is already live when its deal goes out
     for d in deals:
         if not SAFE_ID.fullmatch(d.id):
             raise ValueError(f"deal id not usable as a file name: {d.id!r}")
         (out / "d" / f"{d.id}.html").write_text(deal_page(d, now), encoding="utf-8")
-    print(f"wrote {out / 'index.html'} ({len(page):,} bytes), privacy.html and {len(deals)} deal pages")
+    print(f"wrote {out / 'index.html'} ({len(page):,} bytes), privacy.html, sitemap.xml and {len(deals)} deal pages")
     return 0
 
 

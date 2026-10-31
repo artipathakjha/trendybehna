@@ -1,3 +1,4 @@
+import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -483,6 +484,7 @@ def test_site_lists_posted_deals_newest_first_with_sponsored_links():
     page = site.build([a, b, c], state, NOW)
     assert page.index("New Earrings") < page.index("Old &lt;Saree&gt;")      # newest first, escaped
     assert "Not posted yet" not in page                                      # skipped/unposted deals stay off
+    assert f'<h2><a href="{site.page_url(b)}">New Earrings</a></h2>' in page  # index links each deal's own page
     assert page.count('rel="sponsored nofollow noopener"') == 2
     assert "As an Amazon Associate" in page and "#ad" in page
     assert "{{" not in page
@@ -504,6 +506,14 @@ def test_site_deal_page_and_privacy_page(tmp_path, monkeypatch):
     assert site.main([str(tmp_path)]) == 0
     assert {p.name for p in (tmp_path / "d").iterdir()} == {"amazon-B0X.html", "myntra-1.html"}
     assert (tmp_path / "privacy.html").exists() and (tmp_path / "index.html").exists()
+    assert "<a href=" not in page.split("<h2>")[1].split("</h2>")[0]  # a deal page's own title is not a link
+    # the sitemap lists every page main wrote, and nothing outside the site
+    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    urls = ET.parse(tmp_path / "sitemap.xml").getroot().findall("s:url", ns)
+    locs = [u.findtext("s:loc", namespaces=ns) for u in urls]
+    assert locs == [site.SITE_URL, site.SITE_URL + "privacy.html", site.page_url(amz), site.SITE_URL + "d/myntra-1.html"]
+    assert all(loc.startswith(site.SITE_URL) for loc in locs)
+    assert urls[2].findtext("s:lastmod", namespaces=ns) == f"{amz.checked_at:%Y-%m-%d}"
     monkeypatch.setattr(site, "load_deals", lambda p: [deal(id="../x")])
     with pytest.raises(ValueError):
         site.main([str(tmp_path)])
