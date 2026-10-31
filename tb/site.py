@@ -7,7 +7,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from .captions import WA_CHANNEL, cta, fmt_count, show_price
+from .captions import TG_CHANNEL, cta, fmt_count, show_price
 from .deals import SAFE_ID, SITE_URL, Deal, first_posted, load_deals, load_state, page_url
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -43,8 +43,9 @@ repository. It never sends you messages.</p>
 </article>"""
 IST = timezone(timedelta(hours=5, minutes=30))
 # Only profiles verified as Trendy Behna's own (see the accounts memory); never add one that is not live and ours.
-SOCIAL = [("WhatsApp channel", WA_CHANNEL), ("Telegram", "https://t.me/trendybehna"),
-          ("Instagram", "https://www.instagram.com/trendybehna/"), ("Facebook", "https://www.facebook.com/trendybehna")]
+# The WhatsApp channel is left out: it has no API, so it gets no automatic deals (user's call, 2026-10-31).
+SOCIAL = [("Telegram", TG_CHANNEL), ("Instagram", "https://www.instagram.com/trendybehna/"),
+          ("Facebook", "https://www.facebook.com/trendybehna")]
 
 
 def deal_html(deal: Deal, now: datetime, link: bool = False) -> str:
