@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import html
 import sys
+from urllib.parse import quote
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -64,6 +65,10 @@ def deal_html(deal: Deal, now: datetime, link: bool = False) -> str:
         out.append(f'<p class="blurb">{e(deal.blurb)}</p>')
     # rel=sponsored: affiliate links must be marked for search engines as well as for people
     out.append(f'<a class="buy" href="{e(deal.url)}" rel="sponsored nofollow noopener" target="_blank">{e(cta(deal))}</a>')
+    # visitors share OUR page (never the store link, so no Amazon tag lands in personal chats); a plain link, no JS
+    share = quote(f"{deal.title} - Trendy Behna deal: {page_url(deal)}", safe="")
+    out.append(f'<a class="share" href="https://wa.me/?text={share}" rel="nofollow noopener" target="_blank">'
+               "WhatsApp pe bhejo</a>")
     if deal.store == "amazon":
         out.append('<p class="small">As an Amazon Associate I earn from qualifying purchases.</p>')
     return "".join(out) + "</article>"

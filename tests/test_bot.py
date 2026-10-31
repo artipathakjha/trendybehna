@@ -507,6 +507,10 @@ def test_site_deal_page_and_privacy_page(tmp_path, monkeypatch):
     assert site.page_url(amz) == site.SITE_URL + "d/amazon-B0X.html"
     assert f'<link rel="canonical" href="{site.page_url(amz)}">' in page and "<title>Watch &lt;W&gt; · Trendy Behna" in page
     assert 'href="https://www.amazon.in/dp/B0X?tag=trendybehna-21" rel="sponsored nofollow noopener"' in page
+    # the WhatsApp share button carries our page, never the tagged store link
+    share = page.split('class="share" href="')[1].split('"')[0]
+    assert share.startswith("https://wa.me/?text=") and "amazon.in" not in share and "tag%3D" not in share
+    assert "artipathakjha.github.io%2Ftrendybehna%2Fd%2Famazon-B0X.html" in share
     assert "As an Amazon Associate" in page and "#ad" in page and "privacy.html" in page and "{{" not in page
     policy = site.privacy_page(NOW)
     assert site.CONTACT in policy and "No cookies" in policy and "{{" not in policy
