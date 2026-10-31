@@ -6,6 +6,8 @@ Channels turn on when their secrets are set:
   facebook:  FB_PAGE_ID, FB_PAGE_TOKEN
   instagram: FB_PAGE_ID, FB_PAGE_TOKEN, IG_USER_ID   (Story; --ig-feed adds a best-effort feed post)
   threads:   THREADS_TOKEN plus the FB secrets (the card reaches Threads through the Page's photo CDN)
+  pinterest: PINTEREST_TOKEN (renewed weekly by the pinterest-token workflow); optional PINTEREST_BOARD (board name)
+             and PINTEREST_SANDBOX=1 (while the app has Trial access). Pins link to the deal's site page.
   reels:     REELS=1 adds facebook_reel / instagram_reel (needs ffmpeg; see tb/reel.py);
              REEL_MUSIC=1 adds the per-deal original music from tb/music.py (needs numpy)
 State is saved after every post or failure, so a rerun never double-posts, and a channel that keeps
@@ -23,11 +25,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import captions
-from .channels import meta, telegram, threads
+from .channels import meta, pinterest, telegram, threads
 from .deals import (last_post_time, load_deals, load_state, needs, next_deal, record_failure, register_channels,
                     save_state)
 from .reel import render_reel
 from .render import render
+from .site import page_url
 
 ROOT = Path(__file__).resolve().parent.parent
 DEALS = ROOT / "deals.yaml"
@@ -57,11 +60,14 @@ def enabled_channels(env=os.environ) -> list[str]:
             ch += ["facebook_reel"] + (["instagram_reel"] if env.get("IG_USER_ID") else [])
         if env.get("THREADS_TOKEN"):
             ch.append("threads")
+    if env.get("PINTEREST_TOKEN"):
+        ch.append("pinterest")
     return ch
 
 
 META_UNITS = {"facebook", "instagram", "instagram_feed", "facebook_reel", "instagram_reel", "threads"}
 REEL_UNITS = {"facebook_reel", "instagram_reel"}
+PIN_BOARD = "Trendy Behna Deals"
 
 
 def check_channels(channels: list[str]) -> int:
@@ -69,7 +75,8 @@ def check_channels(channels: list[str]) -> int:
     env, failed = os.environ, 0
     probes = {"telegram": lambda: telegram.check(env["TG_BOT_TOKEN"], env["TG_CHAT"]),
               "facebook": lambda: meta.check(env["FB_PAGE_ID"], env["FB_PAGE_TOKEN"], env.get("IG_USER_ID")),
-              "threads": lambda: threads.check(env["THREADS_TOKEN"])}
+              "threads": lambda: threads.check(env["THREADS_TOKEN"]),
+              "pinterest": lambda: pinterest.check(env["PINTEREST_TOKEN"], pinterest.api_base(env))}
     for ch in [c for c in channels if c in probes]:  # instagram rides on the facebook probe (same Page token)
         try:
             log(msg="channel ok", channel=ch, detail=probes[ch]())
@@ -85,6 +92,11 @@ def publish(unit: str, deal, feed: Path, story: Path | None, now: datetime, page
     if unit == "telegram":
         return telegram.post(env["TG_BOT_TOKEN"], env["TG_CHAT"], feed, captions.telegram(deal, now),
                              captions.cta(deal), deal.url)
+    if unit == "pinterest":
+        tok, api = env["PINTEREST_TOKEN"], pinterest.api_base(env)
+        board = pinterest.board_id(tok, env.get("PINTEREST_BOARD") or PIN_BOARD, api)
+        return pinterest.post(tok, board, feed, captions.pin_title(deal), captions.pinterest(deal, now), page_url(deal),
+                              f"{deal.category}: {deal.title}", api)
     if unit == "facebook":
         return meta.fb_photo(env["FB_PAGE_ID"], page_token, feed, captions.facebook(deal, now))
     page, tok, ig = env["FB_PAGE_ID"], page_token, env["IG_USER_ID"]

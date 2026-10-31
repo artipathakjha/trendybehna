@@ -70,6 +70,8 @@ jobs:
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
+          PINTEREST_TOKEN: ${{ secrets.PINTEREST_TOKEN }}
+          PINTEREST_SANDBOX: ${{ vars.PINTEREST_SANDBOX }}  # repository variable "1" only while the app has Trial access
           REELS: "1"
           REEL_MUSIC: "1"
         run: python -m tb.main ${{ inputs.check && '--check-channels' || '' }} ${{ inputs.test_reel && '--test-reel' || '' }} ${{ (github.event_name == 'schedule' || inputs.guard) && '--min-gap-hours 3' || '' }} ${{ ((github.event_name == 'schedule' && endsWith(github.event.schedule, ' 14 * * *')) || inputs.ig_feed) && '--ig-feed' || '' }}

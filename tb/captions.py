@@ -97,6 +97,35 @@ def instagram(deal: Deal, now: datetime) -> str:
     return "\n".join(lines + ([tags] if tags else [])).replace("\n\n\n", "\n\n")
 
 
+PIN_TITLE_MAX, PIN_DESC_MAX = 100, 800  # Pinterest API v5 limits for title / description
+
+
+def pin_title(deal: Deal) -> str:
+    return deal.title if len(deal.title) <= PIN_TITLE_MAX else deal.title[:PIN_TITLE_MAX - 1].rstrip() + "…"
+
+
+def pinterest(deal: Deal, now: datetime) -> str:
+    """Pin description. Links in it are not clickable: the pin itself opens the deal's page on our site, which
+    carries the store link. The #ad label leads; the disclosure and statement are never cut."""
+    def build(blurb: str) -> str:
+        lines = [f"#ad · {deal.title}", ""]
+        if blurb:
+            lines += [blurb, ""]
+        lines += facts(deal, now)
+        lines += ["", f"Pin pe tap karo: {cta(deal)}", "", footer(deal), " ".join(f"#{t}" for t in deal.tags[:8])]
+        return "\n".join(lines).replace("\n\n\n", "\n\n").strip()
+
+    blurb = deal.blurb
+    out = build(blurb)
+    while len(out) > PIN_DESC_MAX and blurb:
+        blurb = blurb[: max(len(blurb) - (len(out) - PIN_DESC_MAX) - 1, 0)].rstrip()
+        blurb = blurb + "…" if blurb else ""
+        out = build(blurb)
+    if len(out) > PIN_DESC_MAX:
+        raise ValueError(f"deal {deal.id}: pin description cannot fit {PIN_DESC_MAX} chars")
+    return out
+
+
 THREADS_MAX = 500  # Threads rejects longer post text
 
 

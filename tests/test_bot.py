@@ -563,3 +563,120 @@ def test_threads_token_refresh_prints_only_the_new_token(monkeypatch, capsys):
     assert out == "NEWTOKEN" and "60 more days" in err and "NEWTOKEN" not in err
     assert seen["url"] == "https://graph.threads.net/refresh_access_token"
     assert seen["params"]["grant_type"] == "th_refresh_token"
+
+
+def test_pinterest_channel_needs_its_token():
+    assert "pinterest" not in tbmain.enabled_channels({})
+    assert tbmain.enabled_channels({"PINTEREST_TOKEN": "p"}) == ["pinterest"]  # independent of the Meta secrets
+
+
+def test_pinterest_description_fits_leads_with_label_and_keeps_disclosure():
+    amz = deal(store="amazon", url="https://www.amazon.in/dp/B0?tag=trendybehna-21", title="T" * 300, blurb="B" * 900,
+               tags=("watch", "trendybehna"))
+    text = captions.pinterest(amz, NOW)
+    assert len(text) <= captions.PIN_DESC_MAX and text.startswith("#ad")
+    assert captions.AMAZON_STATEMENT in text and captions.DISCLOSURE in text and "₹" not in text and "#watch" in text
+    assert len(captions.pin_title(amz)) == captions.PIN_TITLE_MAX
+    assert "₹999" in captions.pinterest(deal(), NOW)  # Myntra price checked 2h ago is shown
+
+
+def test_pinterest_post_checks_page_then_sends_png_and_returns_id(monkeypatch, tmp_path):
+    import base64
+
+    from tb.channels import pinterest
+    png = tmp_path / "c.png"
+    png.write_bytes(b"\x89PNG fake")
+    calls = []
+
+    def req(method, url, **kw):
+        calls.append((method, url))
+        if method == "HEAD":
+            return FakeResp(200, {})
+        body = kw["json"]
+        assert kw["headers"]["Authorization"] == "Bearer tok" and body["board_id"] == "b1"
+        assert body["link"] == "https://site/d/x.html" and body["title"] == "T" and body["alt_text"] == "Saree: T"
+        assert body["media_source"] == {"source_type": "image_base64", "content_type": "image/png",
+                                        "data": base64.b64encode(b"\x89PNG fake").decode()}
+        return FakeResp(201, {"id": "pin9"})
+    monkeypatch.setattr(http.requests, "request", req)
+    assert pinterest.post("tok", "b1", png, "T", "#ad d", "https://site/d/x.html", "Saree: T") == "pin9"
+    assert calls == [("HEAD", "https://site/d/x.html"), ("POST", pinterest.API + "/pins")]
+
+    calls.clear()
+    monkeypatch.setattr(http.requests, "request", lambda m, u, **k: calls.append(m) or FakeResp(404, {}))
+    monkeypatch.setattr(http.time, "sleep", lambda s: None)
+    with pytest.raises(http.ApiError):  # deal page not live yet: no pin
+        pinterest.post("tok", "b1", png, "T", "d", "https://site/d/x.html", "a")
+    assert "POST" not in calls
+
+
+def test_pinterest_board_found_across_pages_or_created(monkeypatch):
+    from tb.channels import pinterest
+    pages = {None: {"items": [{"id": "1", "name": "Other"}], "bookmark": "bm"},
+             "bm": {"items": [{"id": "7", "name": "Trendy Behna Deals"}], "bookmark": None}}
+    monkeypatch.setattr(http.requests, "request",
+                        lambda m, u, **k: FakeResp(200, pages[k["params"].get("bookmark")]))
+    assert pinterest.board_id("tok", "Trendy Behna Deals") == "7"
+
+    made = []
+
+    def req(m, u, **k):
+        if m == "POST":
+            made.append(k["json"])
+            return FakeResp(201, {"id": "new"})
+        return FakeResp(200, {"items": [], "bookmark": None})
+    monkeypatch.setattr(http.requests, "request", req)
+    assert pinterest.board_id("tok", "Trendy Behna Deals") == "new"
+    assert made[0]["name"] == "Trendy Behna Deals" and made[0]["privacy"] == "PUBLIC"
+
+
+def test_pinterest_publish_links_pin_to_the_deals_site_page(monkeypatch, tmp_path):
+    from tb import site
+    from tb.channels import pinterest
+    seen = {}
+    monkeypatch.setenv("PINTEREST_TOKEN", "tok")
+    monkeypatch.delenv("PINTEREST_SANDBOX", raising=False)
+    monkeypatch.setattr(pinterest, "board_id", lambda tok, name, api: seen.update(board=name, api=api) or "b1")
+    monkeypatch.setattr(pinterest, "post", lambda tok, board, png, title, desc, link, alt, api:
+                        seen.update(link=link, desc=desc) or "pin1")
+    d = deal(id="myntra-5")
+    assert tbmain.publish("pinterest", d, tmp_path / "f.png", None, NOW, None) == "pin1"
+    assert seen["link"] == site.SITE_URL + "d/myntra-5.html" and seen["board"] == tbmain.PIN_BOARD
+    assert seen["api"] == pinterest.API and seen["desc"].startswith("#ad")
+
+
+def test_pinterest_token_connects_with_code_and_never_prints_tokens(monkeypatch, tmp_path, capsys):
+    from tb import pinterest_token
+    a, r = tmp_path / "a", tmp_path / "r"
+    for k in ("PINTEREST_CODE", "PINTEREST_REFRESH_TOKEN", "PINTEREST_SANDBOX"):
+        monkeypatch.delenv(k, raising=False)
+    assert pinterest_token.main([str(a), str(r)]) == 0 and not a.exists()  # not connected yet: nothing to do
+
+    seen = {}
+
+    def req(method, url, **kw):
+        seen.update(url=url, auth=kw["auth"], data=kw["data"])
+        return FakeResp(200, {"access_token": "pina_X", "refresh_token": "pinr_Y", "expires_in": 2592000,
+                              "refresh_token_expires_in": 5184000})
+    monkeypatch.setattr(http.requests, "request", req)
+    monkeypatch.setenv("PINTEREST_APP_ID", "id1")
+    monkeypatch.setenv("PINTEREST_APP_SECRET", "sec")
+    monkeypatch.setenv("PINTEREST_CODE", "c0de")
+    assert pinterest_token.main([str(a), str(r)]) == 0
+    assert seen["url"] == "https://api.pinterest.com/v5/oauth/token" and seen["auth"] == ("id1", "sec")
+    assert seen["data"] == {"grant_type": "authorization_code", "code": "c0de", "redirect_uri": pinterest_token.REDIRECT_URI}
+    assert a.read_text() == "pina_X" and r.read_text() == "pinr_Y"
+    out, err = capsys.readouterr()
+    assert "pina_X" not in out + err and "pinr_Y" not in out + err and "30 days" in err
+
+    monkeypatch.delenv("PINTEREST_CODE")
+    monkeypatch.setenv("PINTEREST_REFRESH_TOKEN", "pinr_OLD")
+    assert pinterest_token.main([str(a), str(r)]) == 0
+    assert seen["data"] == {"grant_type": "refresh_token", "refresh_token": "pinr_OLD"}
+
+
+def test_pinterest_host_is_only_ever_pinterest():
+    from tb.channels import pinterest
+    assert pinterest.api_base({}) == "https://api.pinterest.com/v5"
+    assert pinterest.api_base({"PINTEREST_SANDBOX": "1"}) == "https://api-sandbox.pinterest.com/v5"
+    assert pinterest.api_base({"PINTEREST_SANDBOX": "https://evil.example/v5"}) == "https://api.pinterest.com/v5"
