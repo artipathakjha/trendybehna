@@ -106,6 +106,12 @@ def test_load_deals_validates(tmp_path: Path):
     p.write_text("- {id: 'a/../b', store: myntra, title: T, url: 'https://x', category: C}\n", encoding="utf-8")
     with pytest.raises(ValueError, match="only letters"):
         load_deals(p)
+    p.write_text("- {id: a, store: myntra, title: T, url: 'https://x', category: C, featured: 'yes'}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="featured"):
+        load_deals(p)
+    p.write_text("- {id: a, store: myntra, title: T, url: 'https://x', category: C, featured: true}\n"
+                 "- {id: b, store: myntra, title: T, url: 'https://x', category: C}\n", encoding="utf-8")
+    assert [d.featured for d in load_deals(p)] == [True, False]
 
 
 T0 = "2026-10-30T04:00:00+00:00"
@@ -497,6 +503,22 @@ def test_site_lists_posted_deals_newest_first_with_sponsored_links():
     assert '<meta name="google-site-verification" content="K5iXonF1-' in page  # Search Console ownership stays
     assert page.count('rel="sponsored nofollow noopener"') == 2
     assert "As an Amazon Associate" in page and "#ad" in page
+    assert "{{" not in page
+    assert 'class="pinned"' not in page and site.LATEST_TITLE not in page   # no Reel deals: plain list as before
+
+
+def test_site_pins_featured_deals_above_the_latest_list():
+    from tb import site
+    a = deal(id="a", title="Posted Saree")
+    f = deal(id="f", title="Reel Jhumka", featured=True)        # featured, not posted yet
+    g = deal(id="g", title="Reel Kurta", featured=True)
+    state = {"a": {"telegram": "2026-10-29T05:00:00+00:00 1"}, "g": {"telegram": "2026-10-30T05:00:00+00:00 2"}}
+    page = site.build([a, f, g], state, NOW)
+    assert page.index(site.PINNED_TITLE) < page.index("Reel Jhumka") < page.index("Reel Kurta") \
+        < page.index(site.LATEST_TITLE) < page.index("Posted Saree")
+    assert page.count("Reel Kurta</a></h2>") == 1                             # posted + featured: pinned only, no duplicate
+    assert f'<h2><a href="{site.page_url(f)}">Reel Jhumka</a></h2>' in page  # unposted Reel deal links its own page
+    assert page.count('rel="sponsored nofollow noopener"') == 3
     assert "{{" not in page
 
 

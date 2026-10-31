@@ -17,6 +17,8 @@ MAX_DEALS = 30
 INDEX_TITLE = "Trendy Behna: aaj ke fashion aur jewellery deals"
 INDEX_DESC = ("Saree, kurta set, earrings aur jewellery ke checked deals: Myntra, Amazon aur aur bhi stores. "
               "Har link affiliate hai, aapka price same rehta hai.")
+PINNED_TITLE = "Khaas deals"  # no "seen in the Reel" claim: the flag goes on before the Reel is posted
+LATEST_TITLE = "Roz ke naye deals"
 CONTACT = "trendybehna@gmail.com"
 # Linked from every page; Pinterest's API review asks for a privacy policy URL. Only state what is true today.
 PRIVACY = f"""<article class="deal policy">
@@ -87,9 +89,14 @@ def _page(body: str, title: str, desc: str, canonical: str, more: str, now: date
 
 
 def build(deals: list[Deal], state: dict, now: datetime) -> str:
-    posted = [(first_posted(state.get(d.id, {})), d) for d in deals]
+    pinned = [d for d in deals if d.featured]  # shown even before their first post: Reel viewers look for them now
+    posted = [(first_posted(state.get(d.id, {})), d) for d in deals if not d.featured]
     posted = sorted(((t, d) for t, d in posted if t), key=lambda td: td[0], reverse=True)[:MAX_DEALS]
     body = "\n".join(deal_html(d, now, link=True) for _, d in posted) or '<p class="facts">Naye deals jaldi aa rahe hain.</p>'
+    if pinned:
+        cards = "\n".join(deal_html(d, now, link=True) for d in pinned)
+        body = (f'<section class="pinned"><h2 class="sec">{PINNED_TITLE}</h2>\n{cards}\n</section>\n'
+                f'<h2 class="sec">{LATEST_TITLE}</h2>\n{body}')
     return _page(body, INDEX_TITLE, INDEX_DESC, SITE_URL, "", now)
 
 

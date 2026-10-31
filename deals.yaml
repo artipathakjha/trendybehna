@@ -38,6 +38,7 @@
   - myntra
   - trendybehna
 - id: myntra-32145448
+  featured: true  # Arti Reel 1 "Diwali look" (2026-11-01); move the flag to the next Reel's deals
   store: myntra
   title: MOKOSH Silk Embroidered Anarkali Kurta, Pant & Dupatta Set
   category: Kurta Set
@@ -137,6 +138,7 @@
   - myntra
   - trendybehna
 - id: myntra-9587371
+  featured: true  # Arti Reel 1 "Diwali look" (2026-11-01)
   store: myntra
   title: Rubans Gold-Plated Kundan Layered Jhumka Earrings
   category: Earrings

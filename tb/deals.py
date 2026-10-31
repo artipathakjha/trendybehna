@@ -34,6 +34,7 @@ class Deal:
     ratings_count: int | None = None
     checked_at: datetime | None = None
     tags: tuple[str, ...] = field(default_factory=tuple)
+    featured: bool = False  # pinned at the top of the site index (the deals shown in Arti's latest Reel)
 
     @property
     def store_name(self) -> str:
@@ -83,12 +84,14 @@ def load_deals(path: Path) -> list[Deal]:
             raise ValueError(f"deal id {d['id']!r}: only letters, digits and '-' (it becomes a file name and URL)")
         if not str(d["url"]).startswith("https://"):
             raise ValueError(f"deal {d['id']}: url must be https")
+        if not isinstance(d.get("featured", False), bool):
+            raise ValueError(f"deal {d['id']}: featured must be true or false")
         seen.add(d["id"])
         deals.append(Deal(
             id=d["id"], store=d["store"], title=d["title"], url=d["url"], category=d["category"],
             blurb=d.get("blurb", ""), price=d.get("price"), mrp=d.get("mrp"), rating=d.get("rating"),
             ratings_count=d.get("ratings_count"), checked_at=_parse_dt(d.get("checked_at"), d["id"]),
-            tags=tuple(d.get("tags", [])),
+            tags=tuple(d.get("tags", [])), featured=d.get("featured", False),
         ))
     return deals
 
