@@ -485,6 +485,7 @@ def test_site_lists_posted_deals_newest_first_with_sponsored_links():
     assert page.index("New Earrings") < page.index("Old &lt;Saree&gt;")      # newest first, escaped
     assert "Not posted yet" not in page                                      # skipped/unposted deals stay off
     assert f'<h2><a href="{site.page_url(b)}">New Earrings</a></h2>' in page  # index links each deal's own page
+    assert '<meta name="google-site-verification" content="K5iXonF1-' in page  # Search Console ownership stays
     assert page.count('rel="sponsored nofollow noopener"') == 2
     assert "As an Amazon Associate" in page and "#ad" in page
     assert "{{" not in page
