@@ -3,6 +3,7 @@ Rebuilt by the workflow after every run and served by GitHub Pages.  usage: pyth
 from __future__ import annotations
 
 import html
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -14,6 +15,35 @@ ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "templates" / "site.html"
 SITE_URL = "https://artipathakjha.github.io/trendybehna/"
 MAX_DEALS = 30
+SAFE_ID = re.compile(r"[A-Za-z0-9-]+")
+INDEX_TITLE = "Trendy Behna: aaj ke fashion aur jewellery deals"
+INDEX_DESC = ("Saree, kurta set, earrings aur jewellery ke checked deals: Myntra, Amazon aur aur bhi stores. "
+              "Har link affiliate hai, aapka price same rehta hai.")
+CONTACT = "trendybehna@gmail.com"
+# Linked from every page; Pinterest's API review asks for a privacy policy URL. Only state what is true today.
+PRIVACY = f"""<article class="deal policy">
+<h2>Privacy policy</h2>
+<p>Trendy Behna shares fashion and jewellery deals. This page explains what happens to your data when you use this
+website or follow our posts. Contact: <a href="mailto:{CONTACT}">{CONTACT}</a>.</p>
+<h3>This website</h3>
+<p>No cookies, no analytics, no trackers, no forms and no JavaScript. We do not collect, sell or share personal data.
+The site is hosted on GitHub Pages; GitHub may keep server logs (such as IP addresses) for security, as described in the
+<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub
+Privacy Statement</a>.</p>
+<h3>Affiliate links</h3>
+<p>Deal buttons are affiliate links (Myntra through EarnKaro, Amazon through Amazon Associates, and similar programmes).
+When you open one, that store or network may set cookies to credit the sale to us. Your price stays the same. Their own
+privacy policies apply on their sites.</p>
+<h3>Our posting tool</h3>
+<p>We use an automated tool that publishes our own deal posts to our own accounts on Telegram, Facebook, Instagram,
+Threads and, once connected, Pinterest, through each platform's official API. It acts only on Trendy Behna's accounts,
+does not read or store data about other people, and keeps its access keys only as encrypted secrets in our GitHub
+repository. It never sends you messages.</p>
+<h3>Your choices</h3>
+<p>To ask a question, or to have anything about you removed from our posts, email
+<a href="mailto:{CONTACT}">{CONTACT}</a>. We reply within 7 days.</p>
+<p class="small">Last updated 31 October 2026.</p>
+</article>"""
 IST = timezone(timedelta(hours=5, minutes=30))
 # Only profiles verified as Trendy Behna's own (see the accounts memory); never add one that is not live and ours.
 SOCIAL = [("WhatsApp channel", WA_CHANNEL), ("Telegram", "https://t.me/trendybehna"),
@@ -39,12 +69,11 @@ def deal_html(deal: Deal, now: datetime) -> str:
     return "".join(out) + "</article>"
 
 
-def build(deals: list[Deal], state: dict, now: datetime) -> str:
-    posted = [(first_posted(state.get(d.id, {})), d) for d in deals]
-    posted = sorted(((t, d) for t, d in posted if t), key=lambda td: td[0], reverse=True)[:MAX_DEALS]
-    body = "\n".join(deal_html(d, now) for _, d in posted) or '<p class="facts">Naye deals jaldi aa rahe hain.</p>'
-    social = "".join(f'<a href="{html.escape(url)}" rel="noopener" target="_blank">{name}</a>' for name, url in SOCIAL)
-    subs = {"{{DEALS}}": body, "{{SOCIAL}}": social, "{{SITE_URL}}": SITE_URL,
+def _page(body: str, title: str, desc: str, canonical: str, more: str, now: datetime) -> str:
+    e = html.escape
+    social = "".join(f'<a href="{e(url)}" rel="noopener" target="_blank">{name}</a>' for name, url in SOCIAL)
+    subs = {"{{DEALS}}": body, "{{MORE}}": more, "{{SOCIAL}}": social, "{{TITLE}}": e(title), "{{DESC}}": e(desc),
+            "{{CANONICAL}}": canonical, "{{SITE_URL}}": SITE_URL,
             "{{UPDATED}}": now.astimezone(IST).strftime("%d %b %Y, %I:%M %p IST")}
     out = TEMPLATE.read_text(encoding="utf-8")
     for k, v in subs.items():
@@ -52,12 +81,43 @@ def build(deals: list[Deal], state: dict, now: datetime) -> str:
     return out
 
 
+def build(deals: list[Deal], state: dict, now: datetime) -> str:
+    posted = [(first_posted(state.get(d.id, {})), d) for d in deals]
+    posted = sorted(((t, d) for t, d in posted if t), key=lambda td: td[0], reverse=True)[:MAX_DEALS]
+    body = "\n".join(deal_html(d, now) for _, d in posted) or '<p class="facts">Naye deals jaldi aa rahe hain.</p>'
+    return _page(body, INDEX_TITLE, INDEX_DESC, SITE_URL, "", now)
+
+
+def page_url(deal: Deal) -> str:
+    """Permanent page for one deal: what a pin links to (Pinterest may refuse store short links like myntr.it)."""
+    return f"{SITE_URL}d/{deal.id}.html"
+
+
+def deal_page(deal: Deal, now: datetime) -> str:
+    more = f'<p class="more"><a href="{SITE_URL}">Aaj ke saare deals dekho</a></p>'
+    return _page(deal_html(deal, now), f"{deal.title} · Trendy Behna", deal.blurb or INDEX_DESC, page_url(deal), more, now)
+
+
+def privacy_page(now: datetime) -> str:
+    return _page(PRIVACY, "Privacy policy · Trendy Behna",
+                 "How Trendy Behna handles data: no cookies, no trackers, no personal data collected.",
+                 f"{SITE_URL}privacy.html", f'<p class="more"><a href="{SITE_URL}">Aaj ke deals</a></p>', now)
+
+
 def main(argv: list[str]) -> int:
     out = Path(argv[0])
-    out.mkdir(parents=True, exist_ok=True)
-    page = build(load_deals(ROOT / "deals.yaml"), load_state(ROOT / "state" / "posted.json"), datetime.now(timezone.utc))
+    (out / "d").mkdir(parents=True, exist_ok=True)
+    now = datetime.now(timezone.utc)
+    deals = load_deals(ROOT / "deals.yaml")
+    page = build(deals, load_state(ROOT / "state" / "posted.json"), now)
     (out / "index.html").write_text(page, encoding="utf-8")
-    print(f"wrote {out / 'index.html'} ({len(page):,} bytes)")
+    (out / "privacy.html").write_text(privacy_page(now), encoding="utf-8")
+    # every deal in the queue, posted or not, so a pin's page is already live when its deal goes out
+    for d in deals:
+        if not SAFE_ID.fullmatch(d.id):
+            raise ValueError(f"deal id not usable as a file name: {d.id!r}")
+        (out / "d" / f"{d.id}.html").write_text(deal_page(d, now), encoding="utf-8")
+    print(f"wrote {out / 'index.html'} ({len(page):,} bytes), privacy.html and {len(deals)} deal pages")
     return 0
 
 

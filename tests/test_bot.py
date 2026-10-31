@@ -488,6 +488,27 @@ def test_site_lists_posted_deals_newest_first_with_sponsored_links():
     assert "{{" not in page
 
 
+def test_site_deal_page_and_privacy_page(tmp_path, monkeypatch):
+    from tb import site
+    amz = deal(id="amazon-B0X", store="amazon", url="https://www.amazon.in/dp/B0X?tag=trendybehna-21", title="Watch <W>")
+    page = site.deal_page(amz, NOW)
+    assert site.page_url(amz) == site.SITE_URL + "d/amazon-B0X.html"
+    assert f'<link rel="canonical" href="{site.page_url(amz)}">' in page and "<title>Watch &lt;W&gt; · Trendy Behna" in page
+    assert 'href="https://www.amazon.in/dp/B0X?tag=trendybehna-21" rel="sponsored nofollow noopener"' in page
+    assert "As an Amazon Associate" in page and "#ad" in page and "privacy.html" in page and "{{" not in page
+    policy = site.privacy_page(NOW)
+    assert site.CONTACT in policy and "No cookies" in policy and "{{" not in policy
+    # main writes a page for every queued deal, posted or not, and refuses ids that are not plain file names
+    monkeypatch.setattr(site, "load_deals", lambda p: [amz, deal(id="myntra-1")])
+    monkeypatch.setattr(site, "load_state", lambda p: {})
+    assert site.main([str(tmp_path)]) == 0
+    assert {p.name for p in (tmp_path / "d").iterdir()} == {"amazon-B0X.html", "myntra-1.html"}
+    assert (tmp_path / "privacy.html").exists() and (tmp_path / "index.html").exists()
+    monkeypatch.setattr(site, "load_deals", lambda p: [deal(id="../x")])
+    with pytest.raises(ValueError):
+        site.main([str(tmp_path)])
+
+
 def test_threads_caption_fits_and_keeps_label_link_and_statement():
     amz = deal(store="amazon", url="https://www.amazon.in/dp/B0?tag=trendybehna-21", title="T" * 300, blurb="B" * 400)
     text = captions.threads(amz, NOW)

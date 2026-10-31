@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Trendy Behna: aaj ke fashion aur jewellery deals</title>
-<meta name="description" content="Saree, kurta set, earrings aur jewellery ke checked deals: Myntra, Amazon aur aur bhi stores. Har link affiliate hai, aapka price same rehta hai.">
-<link rel="canonical" href="{{SITE_URL}}">
-<meta property="og:title" content="Trendy Behna: aaj ke deals">
-<meta property="og:description" content="Behna ke liye roz ke checked fashion aur jewellery deals.">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESC}}">
+<link rel="canonical" href="{{CANONICAL}}">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESC}}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="{{SITE_URL}}">
+<meta property="og:url" content="{{CANONICAL}}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
@@ -38,6 +38,11 @@
   .buy { display:inline-block; background:var(--rani); color:#fff; text-decoration:none; font-weight:600; padding:10px 18px;
          border-radius:12px; font-size:15px; }
   .small { font-size:12px; color:#7a5566; margin:8px 0 0; }
+  .more { text-align:center; font-weight:600; }
+  .more a, footer a, .policy a { color:var(--rani); }
+  .policy h2 { font-family:'Playfair Display', serif; font-size:22px; margin:4px 0 8px; }
+  .policy h3 { font-size:16px; margin:14px 0 4px; }
+  .policy p { font-size:14px; margin:0 0 8px; }
   footer { max-width:720px; margin:0 auto; padding:10px 16px 40px; font-size:12px; color:#7a5566; text-align:center; }
   @media (max-width:420px) { h1 { font-size:28px; } .deal h2 { font-size:18px; } }
 </style>
@@ -53,9 +58,10 @@
 </header>
 <main>
 {{DEALS}}
+{{MORE}}
 </main>
 <footer>
-  Price aur stock store pe badal sakte hain; final price store pe hi dekhein. Last update: {{UPDATED}}.
+  Price aur stock store pe badal sakte hain; final price store pe hi dekhein. Last update: {{UPDATED}}. <a href="{{SITE_URL}}privacy.html">Privacy policy</a>
 </footer>
 </body>
 </html>
