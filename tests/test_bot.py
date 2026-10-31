@@ -538,6 +538,26 @@ def test_threads_caption_fits_and_keeps_label_link_and_statement():
     assert page_url(deal()) in captions.threads(deal(), NOW)
 
 
+def test_occasion_follows_the_ist_calendar_and_stays_after_the_ad_label():
+    from tb import reel
+    ist = timedelta(hours=5, minutes=30)
+    assert captions.occasion(datetime(2026, 10, 31, 18, 29, tzinfo=timezone.utc)) is None  # 23:59 IST, 31 Oct
+    diwali = datetime(2026, 10, 31, 18, 30, tzinfo=timezone.utc)                         # 00:00 IST, 1 Nov
+    assert captions.occasion(diwali)[1] == "Diwali ke liye"
+    assert captions.occasion(datetime(2026, 11, 8, 23, 0, tzinfo=timezone.utc) - ist)[1] == "Diwali ke liye"
+    assert captions.occasion(datetime(2026, 11, 10, 9, 0, tzinfo=timezone.utc))[1] == "Bhai Dooj gift idea"
+    assert captions.occasion(datetime(2026, 12, 16, 9, 0, tzinfo=timezone.utc)) is None
+    d = deal(checked_at=diwali - timedelta(hours=1))
+    for fn in (captions.telegram, captions.facebook, captions.instagram, captions.threads):
+        text = fn(d, diwali)
+        assert text.startswith("#ad") and "Diwali ke liye" in text
+    assert _valid_html(captions.telegram(d, diwali))
+    for fn in (captions.telegram, captions.facebook, captions.instagram):
+        assert captions.SHARE in fn(d, diwali) and captions.SHARE in fn(d, NOW)
+    assert '<div class="chip">Diwali ke liye</div>' in reel.scene_html(d, "hook", diwali)
+    assert '<div class="chip">Aaj ka deal</div>' in reel.scene_html(d, "hook", NOW)
+
+
 def test_meta_link_captions_point_to_our_deal_page_not_the_store():
     # Instagram restricted @trendybehna's links on 2026-10-30; Facebook and Threads link our own disclosed page
     for d in (deal(), deal(store="amazon", url="https://www.amazon.in/dp/B0?tag=trendybehna-21")):

@@ -6,11 +6,20 @@
 from __future__ import annotations
 
 import html
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 from .deals import Deal, page_url
 
 PRICE_FRESH = timedelta(hours=24)
+IST = timezone(timedelta(hours=5, minutes=30))
+# (first day, last day IST, emoji, text). Framing only ("for Diwali"), never a claim that the store runs a festival
+# sale. Dates checked 2026-10-31: Diwali (Lakshmi Puja) Sun 8 Nov 2026; Bhai Dooj 10 or 11 Nov (sources differ).
+OCCASIONS = (
+    (date(2026, 11, 1), date(2026, 11, 8), "🪔", "Diwali ke liye"),
+    (date(2026, 11, 9), date(2026, 11, 11), "🎁", "Bhai Dooj gift idea"),
+    (date(2026, 11, 12), date(2026, 12, 15), "💍", "Shaadi season ke liye"),
+)
+SHARE = "Apni behna ko bhejo 💕"  # shares rank Reels and posts; forwards grow the Telegram channel
 WA_CHANNEL = "https://whatsapp.com/channel/0029VbDUg6xFnSzI6HUqs71y"
 TG_CHANNEL = "https://t.me/trendybehna"
 DISCLOSURE = "#ad Affiliate link: aapka price same rehta hai, humein chhota commission milta hai."
@@ -39,6 +48,17 @@ def facts(deal: Deal, now: datetime) -> list[str]:
     return out
 
 
+def occasion(now: datetime) -> tuple[str, str] | None:
+    """(emoji, text) of the festival or season on now's IST date, or None."""
+    today = now.astimezone(IST).date()
+    return next(((emoji, text) for first, last, emoji, text in OCCASIONS if first <= today <= last), None)
+
+
+def occasion_lines(now: datetime) -> list[str]:
+    occ = occasion(now)
+    return [f"{occ[0]} {occ[1]}", ""] if occ else []
+
+
 def cta(deal: Deal) -> str:
     return "Check price on Amazon" if deal.store == "amazon" else f"{deal.store_name} pe dekho"
 
@@ -57,10 +77,11 @@ def telegram(deal: Deal, now: datetime) -> str:
 
     def build(title: str, blurb: str) -> str:
         lines = [f"#ad · <b>{e(title)}</b>", ""]  # ASCI: label upfront, not only after "…more"
+        lines += [e(x) for x in occasion_lines(now)]
         if blurb:
             lines += [e(blurb), ""]
         lines += [e(f) for f in facts(deal, now)]
-        lines += ["", f"👉 {e(cta(deal))}: {e(deal.url)}", "", e(footer(deal))]
+        lines += ["", f"👉 {e(cta(deal))}: {e(deal.url)}", "", f"Forward karo: {e(SHARE)}", "", e(footer(deal))]
         return "\n".join(lines).replace("\n\n\n", "\n\n")
 
     title, blurb = deal.title, deal.blurb
@@ -79,21 +100,22 @@ def telegram(deal: Deal, now: datetime) -> str:
 
 def facebook(deal: Deal, now: datetime) -> str:
     """Links the deal's page on our site, not the store (see deals.page_url)."""
-    lines = [f"#ad · {deal.title}", ""]
+    lines = [f"#ad · {deal.title}", ""] + occasion_lines(now)
     if deal.blurb:
         lines += [deal.blurb, ""]
     lines += facts(deal, now)
-    lines += ["", f"👉 {cta(deal)}: {page_url(deal)}", "", f"Roz ki deals: Telegram {TG_CHANNEL}", "", footer(deal)]
+    lines += ["", f"👉 {cta(deal)}: {page_url(deal)}", "", SHARE, "", f"Roz ki deals: Telegram {TG_CHANNEL}", "",
+              footer(deal)]
     return "\n".join(lines).replace("\n\n\n", "\n\n")
 
 
 def instagram(deal: Deal, now: datetime) -> str:
     """Instagram captions cannot hold clickable links; send people to the channels in the bio."""
-    lines = [f"#ad · {deal.title}", ""]
+    lines = [f"#ad · {deal.title}", ""] + occasion_lines(now)
     if deal.blurb:
         lines += [deal.blurb, ""]
     lines += facts(deal, now)
-    lines += ["", "Link: bio mein website / Telegram channel 👆", "", footer(deal)]
+    lines += ["", "Link: bio mein website / Telegram channel 👆", "", SHARE, "", footer(deal)]
     tags = " ".join(f"#{t}" for t in deal.tags[:8])
     return "\n".join(lines + ([tags] if tags else [])).replace("\n\n\n", "\n\n")
 
@@ -135,7 +157,7 @@ def threads(deal: Deal, now: datetime) -> str:
     Shortens the blurb, then the title, to stay within 500 chars; the #ad label, the link and the disclosure are
     never cut."""
     def build(title: str, blurb: str) -> str:
-        lines = [f"#ad · {title}", ""]
+        lines = [f"#ad · {title}", ""] + occasion_lines(now)
         if blurb:
             lines += [blurb, ""]
         lines += facts(deal, now)

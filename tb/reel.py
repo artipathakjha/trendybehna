@@ -15,7 +15,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from .captions import fmt_count, show_price
+from .captions import fmt_count, occasion, show_price
 from .deals import Deal
 from .render import screenshot
 
@@ -82,7 +82,8 @@ def scene_html(deal: Deal, scene: str, now: datetime, voiced: bool = False) -> s
     if deal.store == "amazon":
         ad += "<br>As an Amazon Associate I earn from qualifying purchases."
     if scene == "hook":
-        body = (f'<div class="brand">ट्रेंडी बहना</div><div class="chip">Aaj ka deal</div>'
+        occ = occasion(now)  # text only: the runner's Chrome may have no colour emoji font
+        body = (f'<div class="brand">ट्रेंडी बहना</div><div class="chip">{e(occ[1]) if occ else "Aaj ka deal"}</div>'
                 f'<div class="hook">{hook_html(deal, now)}</div>')
     elif scene == "product":
         facts = []
