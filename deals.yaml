@@ -103,6 +103,22 @@
   - boho
   - amazon
   - trendybehna
+- id: myntra-39290664
+  store: myntra
+  title: Mast & Harbour Oversized Zip Detail Shopper Tote Bag
+  category: Handbag
+  blurb: Bada oversized shopper tote, zip detail ke saath.
+  url: https://myntr.it/hpgr2iN
+  price: 639
+  mrp: 3499
+  rating: 4.6
+  ratings_count: 12300
+  checked_at: 2026-10-31 01:55:00+00:00
+  tags:
+  - handbag
+  - bags
+  - myntra
+  - trendybehna
 - id: myntra-19674622
   store: myntra
   title: Libas Peach Floral Kurta with Trousers & Dupatta
@@ -136,6 +152,20 @@
   - earrings
   - kundan
   - myntra
+  - trendybehna
+- id: amazon-B07CR1JQBY
+  store: amazon
+  title: Titan Karishma Analog Champagne Dial Women's Watch
+  category: Watch
+  blurb: Champagne dial wali Titan Karishma analog watch.
+  url: https://www.amazon.in/dp/B07CR1JQBY?tag=trendybehna-21
+  rating: 4.2
+  ratings_count: 4134
+  checked_at: 2026-10-31 01:52:00+00:00
+  tags:
+  - watch
+  - womenswatch
+  - amazon
   - trendybehna
 - id: myntra-33360023
   store: myntra
@@ -172,6 +202,22 @@
   - daily
   - myntra
   - trendybehna
+- id: myntra-40595695
+  store: myntra
+  title: SZN Square Toe Kitten Mules
+  category: Footwear
+  blurb: Square toe kitten heel mules, halki heel mein stylish look.
+  url: https://myntr.it/w50mWK0
+  price: 545
+  mrp: 1999
+  rating: 4.2
+  ratings_count: 4700
+  checked_at: 2026-10-31 01:55:00+00:00
+  tags:
+  - footwear
+  - heels
+  - myntra
+  - trendybehna
 - id: amazon-B08L13PPNS
   store: amazon
   title: Shining Diva Antique Kundan Choker Necklace Set
@@ -203,6 +249,20 @@
   - zaveripearls
   - set
   - myntra
+  - trendybehna
+- id: amazon-B0D2DLQMGY
+  store: amazon
+  title: Lavie Women's Betula Tote Handbag
+  category: Handbag
+  blurb: Lavie ka tote handbag, roz ke use ke liye.
+  url: https://www.amazon.in/dp/B0D2DLQMGY?tag=trendybehna-21
+  rating: 4.1
+  ratings_count: 24863
+  checked_at: 2026-10-31 01:52:00+00:00
+  tags:
+  - handbag
+  - bags
+  - amazon
   - trendybehna
 - id: myntra-40445931
   store: myntra
@@ -239,6 +299,19 @@
   - embroidered
   - myntra
   - trendybehna
+- id: amazon-B00QYQ38J4
+  store: amazon
+  title: Zaveri Pearls Pink Kundan & Austrian Diamond Dangle Earrings
+  category: Earrings
+  blurb: Pink kundan aur Austrian diamonds wale dangle earrings, ethnic look ke liye.
+  url: https://www.amazon.in/dp/B00QYQ38J4?tag=trendybehna-21
+  rating: 4.3
+  ratings_count: 3419
+  checked_at: 2026-10-31 01:52:00+00:00
+  tags:
+  - earrings
+  - amazon
+  - trendybehna
 - id: amazon-B091MK45DB
   store: amazon
   title: Shining Diva Rose Gold Austrian Crystal Bracelet
@@ -269,6 +342,22 @@
   - earrings
   - hoops
   - antitarnish
+  - myntra
+  - trendybehna
+- id: myntra-39265510
+  store: myntra
+  title: Lavie Embellished Party Block Sandals
+  category: Footwear
+  blurb: Embellished block heel sandals, party ke liye.
+  url: https://myntr.it/mveldS2
+  price: 841
+  mrp: 2499
+  rating: 4.5
+  ratings_count: 2100
+  checked_at: 2026-10-31 01:55:00+00:00
+  tags:
+  - footwear
+  - heels
   - myntra
   - trendybehna
 - id: myntra-30881028
@@ -305,6 +394,22 @@
   - chikankari
   - myntra
   - trendybehna
+- id: myntra-8376999
+  store: myntra
+  title: Lino Perros Quilted Structured Handheld Bag with Detachable Strap
+  category: Handbag
+  blurb: Quilted structured handbag, detachable strap ke saath.
+  url: https://myntr.it/f5hZkgV
+  price: 1708
+  mrp: 4495
+  rating: 4.5
+  ratings_count: 16800
+  checked_at: 2026-10-31 01:55:00+00:00
+  tags:
+  - handbag
+  - bags
+  - myntra
+  - trendybehna
 - id: myntra-31430396
   store: myntra
   title: Rubans Gold-Plated Ruby & Kundan Necklace Set with Jhumkas
@@ -335,6 +440,20 @@
   - bracelet
   - crystal
   - party
+  - amazon
+  - trendybehna
+- id: amazon-B0FRFXX2C3
+  store: amazon
+  title: KLOSIA Rayon Printed Anarkali Kurta, Pant & Dupatta Set
+  category: Kurta Set
+  blurb: Rayon printed anarkali kurta, pant aur dupatta ke saath poora set.
+  url: https://www.amazon.in/dp/B0FRFXX2C3?tag=trendybehna-21
+  rating: 4.1
+  ratings_count: 11172
+  checked_at: 2026-10-31 01:52:00+00:00
+  tags:
+  - kurtaset
+  - ethnicwear
   - amazon
   - trendybehna
 - id: myntra-39187946
@@ -371,6 +490,20 @@
   - wedding
   - myntra
   - trendybehna
+- id: amazon-B008PDQT6I
+  store: amazon
+  title: Casio Vintage Rose Gold Digital Women's Watch B640WC
+  category: Watch
+  blurb: Casio Vintage series ki rose gold digital watch.
+  url: https://www.amazon.in/dp/B008PDQT6I?tag=trendybehna-21
+  rating: 4.4
+  ratings_count: 8096
+  checked_at: 2026-10-31 01:52:00+00:00
+  tags:
+  - watch
+  - womenswatch
+  - amazon
+  - trendybehna
 - id: myntra-38459602
   store: myntra
   title: BFC Geometric Jhumka Earrings
@@ -405,6 +538,22 @@
   - jewellery
   - myntra
   - trendybehna
+- id: myntra-15528408
+  store: myntra
+  title: Mochi Gold-Toned Embellished T-Strap Wedges
+  category: Footwear
+  blurb: Gold-toned embellished T-strap wedge sandals.
+  url: https://myntr.it/hTK9QMa
+  price: 975
+  mrp: 1990
+  rating: 4.4
+  ratings_count: 3100
+  checked_at: 2026-10-31 01:55:00+00:00
+  tags:
+  - footwear
+  - heels
+  - myntra
+  - trendybehna
 - id: myntra-38049315
   store: myntra
   title: ZENEME Kundan & Pearl Jhumkas with Ear Chain
@@ -437,6 +586,20 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: amazon-B0BQWF3TJK
+  store: amazon
+  title: ZOUK Flap Sling Bag
+  category: Handbag
+  blurb: Flap design wala sling bag.
+  url: https://www.amazon.in/dp/B0BQWF3TJK?tag=trendybehna-21
+  rating: 4.4
+  ratings_count: 1242
+  checked_at: 2026-10-31 01:52:00+00:00
+  tags:
+  - handbag
+  - bags
+  - amazon
+  - trendybehna
 - id: myntra-42744011
   store: myntra
   title: SP SAREES Sequinned Heavy Work Kanjeevaram Saree
@@ -467,6 +630,22 @@
   tags:
   - jewellery
   - choker
+  - myntra
+  - trendybehna
+- id: myntra-39622020
+  store: myntra
+  title: Berrylicious Ethnic Motifs Printed Empire Kurta with Trousers & Dupatta
+  category: Kurta Set
+  blurb: Ethnic motif print wala empire kurta, trousers aur dupatta ke saath.
+  url: https://myntr.it/DnBkm3H
+  price: 1148
+  mrp: 2970
+  rating: 4.4
+  ratings_count: 5800
+  checked_at: 2026-10-31 01:55:00+00:00
+  tags:
+  - kurtaset
+  - ethnicwear
   - myntra
   - trendybehna
 - id: myntra-37621715
@@ -501,6 +680,19 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: amazon-B07JM3F3G1
+  store: amazon
+  title: Voylla Work Essentials Round Cut Gem Earrings
+  category: Earrings
+  blurb: Round cut gem earrings, kaam pe roz pehenne ke liye.
+  url: https://www.amazon.in/dp/B07JM3F3G1?tag=trendybehna-21
+  rating: 4.3
+  ratings_count: 1259
+  checked_at: 2026-10-31 01:52:00+00:00
+  tags:
+  - earrings
+  - amazon
+  - trendybehna
 - id: myntra-18316312
   store: myntra
   title: Rubans 22K Gold-Plated Ruby & Emerald Handcrafted Choker Set
@@ -531,6 +723,22 @@
   tags:
   - kurtaset
   - ethnicwear
+  - myntra
+  - trendybehna
+- id: myntra-23641136
+  store: myntra
+  title: MIRAGGIO Colourblocked Bella Shoulder Bag with Detachable Strap
+  category: Handbag
+  blurb: Colourblocked shoulder bag, detachable strap ke saath.
+  url: https://myntr.it/qP5aeH9
+  price: 2624
+  mrp: 3499
+  rating: 4.7
+  ratings_count: 4900
+  checked_at: 2026-10-31 01:55:00+00:00
+  tags:
+  - handbag
+  - bags
   - myntra
   - trendybehna
 - id: myntra-39991600
@@ -565,6 +773,20 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: amazon-B0G7189R4V
+  store: amazon
+  title: Nermosa Embroidered A-Line Kurta, Pant & Dupatta Set
+  category: Kurta Set
+  blurb: A-line kurta pe embroidery, pant aur dupatta ke saath.
+  url: https://www.amazon.in/dp/B0G7189R4V?tag=trendybehna-21
+  rating: 4.2
+  ratings_count: 1683
+  checked_at: 2026-10-31 01:52:00+00:00
+  tags:
+  - kurtaset
+  - ethnicwear
+  - amazon
+  - trendybehna
 - id: myntra-33332622
   store: myntra
   title: Anouk Sequinned Tissue Designer Saree
@@ -592,6 +814,22 @@
   rating: 4.2
   ratings_count: 895
   checked_at: 2026-10-30 12:46:13+05:30
+  tags:
+  - kurtaset
+  - ethnicwear
+  - myntra
+  - trendybehna
+- id: myntra-32737401
+  store: myntra
+  title: MOKOSH Silk Embroidered Anarkali Kurta, Pant & Dupatta Set
+  category: Kurta Set
+  blurb: Silk anarkali kurta pe embroidery, pant aur dupatta ke saath.
+  url: https://myntr.it/t6BzxN3
+  price: 1543
+  mrp: 4899
+  rating: 4.5
+  ratings_count: 7400
+  checked_at: 2026-10-31 01:55:00+00:00
   tags:
   - kurtaset
   - ethnicwear
