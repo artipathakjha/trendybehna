@@ -10,7 +10,7 @@ Posts one checked affiliate deal from `deals.yaml` to every configured channel, 
 | Facebook Page | card + caption, and a Reel | `FB_PAGE_ID`, `FB_PAGE_TOKEN` |
 | Instagram | Story, a Reel, and a feed post on the evening slot | the two FB secrets plus `IG_USER_ID` |
 | Threads | card + text with a clickable link | `THREADS_TOKEN` (renewed weekly by `refresh-threads-token`, which needs `SECRETS_PAT`) |
-| Pinterest (not connected yet) | card pin linking to the deal's page on the site | `PINTEREST_TOKEN`, kept fresh by `pinterest-token` (see below) |
+| Pinterest (Trial access: pins visible only to us) | card pin linking to the deal's page on the site | `PINTEREST_TOKEN`, kept fresh by `pinterest-token` (see below) |
 | Deals page | the 30 latest posted deals, a page per deal, a privacy policy | none (GitHub Pages: https://artipathakjha.github.io/trendybehna/) |
 
 Reels (`tb/reel.py`) are 8-9 s videos made from the deal: three scenes, rotating colour themes, an on-screen
@@ -44,7 +44,7 @@ Pins link to `https://artipathakjha.github.io/trendybehna/d/<deal id>.html`, nev
 3. While the app has Trial access, pins are sandbox-only: set the repository variable `PINTEREST_SANDBOX` to `1`;
    delete it once Standard access is granted.
 4. Connect: open
-   `https://www.pinterest.com/oauth/?client_id=<APP_ID>&redirect_uri=https://artipathakjha.github.io/trendybehna/&response_type=code&scope=boards:read,boards:write,pins:write,user_accounts:read`,
+   `https://www.pinterest.com/oauth/?client_id=<APP_ID>&redirect_uri=https://artipathakjha.github.io/trendybehna/&response_type=code&scope=boards:read,boards:write,pins:read,pins:write,user_accounts:read`,
    allow, copy the `code=` value from the address it lands on, then Actions → pinterest-token → Run workflow with
    that code (it works once, for a few minutes). Then run post-deals with `check`.
 5. Every Sunday `pinterest-token` swaps the refresh token for a fresh pair. Pinterest refresh tokens change on every
