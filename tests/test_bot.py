@@ -618,12 +618,13 @@ def test_occasion_follows_the_ist_calendar_and_stays_after_the_ad_label():
     assert captions.occasion(diwali)[1] == "Diwali ke liye"
     assert captions.occasion(datetime(2026, 11, 8, 23, 0, tzinfo=timezone.utc) - ist)[1] == "Diwali ke liye"
     assert captions.occasion(datetime(2026, 11, 10, 9, 0, tzinfo=timezone.utc))[1] == "Bhai Dooj gift idea"
-    assert captions.occasion(datetime(2026, 12, 16, 9, 0, tzinfo=timezone.utc))[1] == "Christmas aur New Year party ke liye"
-    assert captions.occasion(datetime(2027, 1, 15, 9, 0, tzinfo=timezone.utc))[1] == "Lohri aur Sankranti ke liye"
+    assert captions.occasion(datetime(2026, 12, 16, 9, 0, tzinfo=timezone.utc))[1] == "New Year party ke liye"
+    assert captions.occasion(datetime(2027, 1, 15, 9, 0, tzinfo=timezone.utc))[1] == "Lohri, Sankranti ke liye"
     assert captions.occasion(datetime(2027, 3, 22, 9, 0, tzinfo=timezone.utc))[1] == "Holi ke liye"
     assert captions.occasion(datetime(2027, 3, 25, 9, 0, tzinfo=timezone.utc)) is None  # no shaadi muhurats, no festival
     assert captions.occasion(datetime(2027, 5, 1, 9, 0, tzinfo=timezone.utc)) is None
     # in order and never overlapping, so one day can only ever match one line
+    assert all(len(text) <= 24 for *_, text in captions.OCCASIONS)  # the Reel hook pill holds about 25 capitals on one line
     spans = [(first, last) for first, last, _, _ in captions.OCCASIONS]
     assert all(first <= last for first, last in spans) and all(a[1] < b[0] for a, b in zip(spans, spans[1:]))
     d = deal(checked_at=diwali - timedelta(hours=1))
