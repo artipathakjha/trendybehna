@@ -3,6 +3,7 @@ Rebuilt by the workflow after every run and served by GitHub Pages.  usage: pyth
 from __future__ import annotations
 
 import html
+import re
 import sys
 from urllib.parse import quote
 from datetime import datetime, timedelta, timezone
@@ -10,6 +11,7 @@ from pathlib import Path
 
 from .captions import TG_CHANNEL, cta, fmt_count, show_price
 from .deals import SAFE_ID, SITE_URL, Deal, first_posted, load_deals, load_state, page_url
+from .indexnow import KEY as INDEXNOW_KEY
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "templates" / "site.html"
@@ -76,6 +78,29 @@ def deal_html(deal: Deal, now: datetime, link: bool = False) -> str:
     return "".join(out) + "</article>"
 
 
+def category_url(category: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", category.lower()).strip("-")
+    if not slug:
+        raise ValueError(f"category has no latin letters for its page address: {category!r}")
+    return f"{SITE_URL}c/{slug}.html"
+
+
+def categories(deals: list[Deal]) -> dict[str, list[Deal]]:
+    """Biggest category first; inside one, the deals most buyers have rated. These pages give every deal, posted or
+    not, a link search engines can follow: the index only shows the latest posted deals."""
+    groups: dict[str, list[Deal]] = {}
+    names: dict[str, str] = {}
+    for d in deals:  # "Kurta Set" and "kurta-set" have one address, so they share one page, under the first spelling
+        groups.setdefault(names.setdefault(category_url(d.category), d.category), []).append(d)
+    return {c: sorted(ds, key=lambda d: -(d.ratings_count or 0))
+            for c, ds in sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0]))}
+
+
+def category_nav(groups: dict[str, list[Deal]]) -> str:
+    links = "".join(f'<a href="{html.escape(category_url(c))}">{html.escape(c)} ({len(ds)})</a>' for c, ds in groups.items())
+    return f'<nav class="cats" aria-label="Categories">{links}</nav>'
+
+
 def _page(body: str, title: str, desc: str, canonical: str, more: str, now: datetime) -> str:
     e = html.escape
     social = "".join(f'<a href="{e(url)}" rel="noopener" target="_blank">{name}</a>' for name, url in SOCIAL)
@@ -97,12 +122,26 @@ def build(deals: list[Deal], state: dict, now: datetime) -> str:
         cards = "\n".join(deal_html(d, now, link=True) for d in pinned)
         body = (f'<section class="pinned"><h2 class="sec">{PINNED_TITLE}</h2>\n{cards}\n</section>\n'
                 f'<h2 class="sec">{LATEST_TITLE}</h2>\n{body}')
-    return _page(body, INDEX_TITLE, INDEX_DESC, SITE_URL, "", now)
+    return _page(f"{category_nav(categories(deals))}\n{body}", INDEX_TITLE, INDEX_DESC, SITE_URL, "", now)
 
 
 def deal_page(deal: Deal, now: datetime) -> str:
-    more = f'<p class="more"><a href="{SITE_URL}">Aaj ke saare deals dekho</a></p>'
+    more = (f'<p class="more"><a href="{html.escape(category_url(deal.category))}">Aur {html.escape(deal.category)} deals dekho</a> · '
+            f'<a href="{SITE_URL}">Aaj ke saare deals dekho</a></p>')
     return _page(deal_html(deal, now), f"{deal.title} · Trendy Behna", deal.blurb or INDEX_DESC, page_url(deal), more, now)
+
+
+def category_page(category: str, deals: list[Deal], groups: dict[str, list[Deal]], now: datetime) -> str:
+    stores = " aur ".join(sorted({d.store_name for d in deals}))
+    # read from the deals, so always true, and only when every card shows its rating (deal_html needs both fields)
+    shown = all(d.rating and d.ratings_count for d in deals)
+    rated = f", sab {min(d.rating for d in deals)} star ya usse upar" if shown else ""
+    count = f"{len(deals)} deal" + ("s" if len(deals) > 1 else "")
+    desc = f"{category} ke {count}, {stores} se{rated}. Har link affiliate hai, aapka price same rehta hai."
+    cards = "\n".join(deal_html(d, now, link=True) for d in deals)
+    more = f'{category_nav(groups)}\n<p class="more"><a href="{SITE_URL}">Aaj ke saare deals dekho</a></p>'
+    return _page(f'<h2 class="sec">{html.escape(category)} deals</h2>\n{cards}', f"{category} deals: {stores} · Trendy Behna",
+                 desc, category_url(category), more, now)
 
 
 def privacy_page(now: datetime) -> str:
@@ -115,6 +154,8 @@ def sitemap(deals: list[Deal], now: datetime) -> str:
     """Every page we serve, for Google Search Console. A deal page's lastmod is when its deal was checked: its real
     content. Served under /trendybehna/, so it may only list pages under it (all of ours are)."""
     rows = [(SITE_URL, now), (f"{SITE_URL}privacy.html", None)] + [(page_url(d), d.checked_at) for d in deals]
+    rows += [(category_url(c), max((d.checked_at for d in ds if d.checked_at), default=None))
+             for c, ds in categories(deals).items()]
     urls = "".join(f"<url><loc>{html.escape(u)}</loc>" + (f"<lastmod>{t:%Y-%m-%d}</lastmod>" if t else "") + "</url>\n"
                    for u, t in rows)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n'
@@ -123,18 +164,24 @@ def sitemap(deals: list[Deal], now: datetime) -> str:
 def main(argv: list[str]) -> int:
     out = Path(argv[0])
     (out / "d").mkdir(parents=True, exist_ok=True)
+    (out / "c").mkdir(exist_ok=True)
     now = datetime.now(timezone.utc)
     deals = load_deals(ROOT / "deals.yaml")
     page = build(deals, load_state(ROOT / "state" / "posted.json"), now)
     (out / "index.html").write_text(page, encoding="utf-8")
     (out / "privacy.html").write_text(privacy_page(now), encoding="utf-8")
     (out / "sitemap.xml").write_text(sitemap(deals, now), encoding="utf-8")
+    (out / f"{INDEXNOW_KEY}.txt").write_text(INDEXNOW_KEY, encoding="utf-8")
     # every deal in the queue, posted or not, so a pin's page is already live when its deal goes out
     for d in deals:
         if not SAFE_ID.fullmatch(d.id):
             raise ValueError(f"deal id not usable as a file name: {d.id!r}")
         (out / "d" / f"{d.id}.html").write_text(deal_page(d, now), encoding="utf-8")
-    print(f"wrote {out / 'index.html'} ({len(page):,} bytes), privacy.html, sitemap.xml and {len(deals)} deal pages")
+    groups = categories(deals)
+    for c, ds in groups.items():
+        (out / category_url(c).removeprefix(SITE_URL)).write_text(category_page(c, ds, groups, now), encoding="utf-8")
+    print(f"wrote {out / 'index.html'} ({len(page):,} bytes), privacy.html, sitemap.xml, {len(deals)} deal pages "
+          f"and {len(groups)} category pages")
     return 0
 
 

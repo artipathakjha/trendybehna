@@ -18,6 +18,16 @@ OCCASIONS = (
     (date(2026, 11, 1), date(2026, 11, 8), "🪔", "Diwali ke liye"),
     (date(2026, 11, 9), date(2026, 11, 11), "🎁", "Bhai Dooj gift idea"),
     (date(2026, 11, 12), date(2026, 12, 15), "💍", "Shaadi season ke liye"),
+    # Dates checked 2026-11-07 on Drik Panchang (New Delhi). No wedding muhurats in Kharmas, 16 Dec to 14 Jan, nor from
+    # 15 Mar to 17 Apr, so "Shaadi" stops there. Eid is left out: its date depends on the moon sighting.
+    (date(2026, 12, 16), date(2026, 12, 31), "🎄", "Christmas aur New Year party ke liye"),
+    (date(2027, 1, 1), date(2027, 1, 15), "🪁", "Lohri aur Sankranti ke liye"),
+    (date(2027, 1, 16), date(2027, 2, 7), "💍", "Shaadi season ke liye"),
+    (date(2027, 2, 8), date(2027, 2, 14), "💝", "Valentine's Day gift idea"),
+    (date(2027, 2, 15), date(2027, 3, 10), "💍", "Shaadi season ke liye"),
+    (date(2027, 3, 11), date(2027, 3, 22), "🎨", "Holi ke liye"),
+    (date(2027, 4, 1), date(2027, 4, 15), "🌸", "Navratri ke liye"),
+    (date(2027, 4, 18), date(2027, 4, 30), "💍", "Shaadi season ke liye"),
 )
 SHARE = "Apni behna ko bhejo 💕"  # shares rank Reels and posts; forwards grow the Telegram channel
 WA_CHANNEL = "https://whatsapp.com/channel/0029VbDUg6xFnSzI6HUqs71y"

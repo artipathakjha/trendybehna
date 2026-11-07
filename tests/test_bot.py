@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from tb import captions, http
+from tb import captions, http, indexnow
 from tb import main as tbmain
 from tb.deals import MAX_FAILS, Deal, load_deals, needs, next_deal, page_url, record_failure
 
@@ -547,10 +547,56 @@ def test_site_deal_page_and_privacy_page(tmp_path, monkeypatch):
     ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     urls = ET.parse(tmp_path / "sitemap.xml").getroot().findall("s:url", ns)
     locs = [u.findtext("s:loc", namespaces=ns) for u in urls]
-    assert locs == [site.SITE_URL, site.SITE_URL + "privacy.html", site.page_url(amz), site.SITE_URL + "d/myntra-1.html"]
+    assert locs == [site.SITE_URL, site.SITE_URL + "privacy.html", site.page_url(amz), site.SITE_URL + "d/myntra-1.html",
+                    site.SITE_URL + "c/saree.html"]
     assert all(loc.startswith(site.SITE_URL) for loc in locs)
     assert urls[2].findtext("s:lastmod", namespaces=ns) == f"{amz.checked_at:%Y-%m-%d}"
     monkeypatch.setattr(site, "load_deals", lambda p: [deal(id="../x")])
+    with pytest.raises(ValueError):
+        site.main([str(tmp_path)])
+
+
+def test_category_pages_link_every_deal_and_every_deal_links_back(tmp_path, monkeypatch):
+    from tb import site
+    a = deal(id="myntra-1", title="Few ratings", ratings_count=500)
+    b = deal(id="amazon-B0", store="amazon", title="Many ratings", ratings_count=9000,
+             url="https://www.amazon.in/dp/B0?tag=trendybehna-21")
+    c = deal(id="myntra-2", title="Gold Tikka", category="Maang Tikka", ratings_count=900)
+    monkeypatch.setattr(site, "load_deals", lambda p: [a, b, c])
+    monkeypatch.setattr(site, "load_state", lambda p: {})
+    assert site.main([str(tmp_path)]) == 0
+    assert {p.name for p in (tmp_path / "c").iterdir()} == {"saree.html", "maang-tikka.html"}
+    saree = (tmp_path / "c" / "saree.html").read_text(encoding="utf-8")
+    assert saree.index("Many ratings") < saree.index("Few ratings") and "Gold Tikka" not in saree
+    assert f'href="{site.page_url(a)}"' in saree and f'href="{site.page_url(b)}"' in saree
+    assert f'<link rel="canonical" href="{site.SITE_URL}c/saree.html">' in saree and "{{" not in saree
+    assert "<title>Saree deals: Amazon aur Myntra · Trendy Behna" in saree
+    assert 'rel="sponsored nofollow noopener"' in saree and "#ad" in saree and "As an Amazon Associate" in saree
+    # the index reaches every category, biggest first, and a deal page links back to its own
+    index = (tmp_path / "index.html").read_text(encoding="utf-8")
+    assert index.index("Saree (2)") < index.index("Maang Tikka (1)") and f"{site.SITE_URL}c/maang-tikka.html" in index
+    assert f'{site.SITE_URL}c/maang-tikka.html"' in (tmp_path / "d" / "myntra-2.html").read_text(encoding="utf-8")
+
+
+def test_category_page_copes_with_a_deal_missing_its_optional_fields(tmp_path, monkeypatch):
+    from tb import site
+    bare = deal(id="myntra-1", rating=None, ratings_count=None, checked_at=None)
+    monkeypatch.setattr(site, "load_deals", lambda p: [bare, deal(id="myntra-2", rating=4.3)])
+    monkeypatch.setattr(site, "load_state", lambda p: {})
+    assert site.main([str(tmp_path)]) == 0
+    assert "star ya usse upar" not in (tmp_path / "c" / "saree.html").read_text(encoding="utf-8")
+    assert "Saree ke 1 deals" not in site.category_page("Saree", [deal(rating=4.3)], {}, NOW)
+    assert "sab 4.1 star ya usse upar" in site.category_page("Saree", [deal(rating=4.3), deal(rating=4.1)], {}, NOW)
+    assert "star ya usse upar" not in site.category_page("Saree", [deal(ratings_count=None)], {}, NOW)
+
+
+def test_category_spelling_variants_share_one_page_and_a_nameless_category_stops_the_build(tmp_path, monkeypatch):
+    from tb import site
+    variants = [deal(id="myntra-1", category="Kurta Set"), deal(id="myntra-2", category="kurta-set")]
+    assert {c: len(ds) for c, ds in site.categories(variants).items()} == {"Kurta Set": 2}
+    assert "kurta-set.html" in site.deal_page(variants[1], NOW)
+    monkeypatch.setattr(site, "load_deals", lambda p: [deal(category="साड़ी")])
+    monkeypatch.setattr(site, "load_state", lambda p: {})
     with pytest.raises(ValueError):
         site.main([str(tmp_path)])
 
@@ -572,7 +618,14 @@ def test_occasion_follows_the_ist_calendar_and_stays_after_the_ad_label():
     assert captions.occasion(diwali)[1] == "Diwali ke liye"
     assert captions.occasion(datetime(2026, 11, 8, 23, 0, tzinfo=timezone.utc) - ist)[1] == "Diwali ke liye"
     assert captions.occasion(datetime(2026, 11, 10, 9, 0, tzinfo=timezone.utc))[1] == "Bhai Dooj gift idea"
-    assert captions.occasion(datetime(2026, 12, 16, 9, 0, tzinfo=timezone.utc)) is None
+    assert captions.occasion(datetime(2026, 12, 16, 9, 0, tzinfo=timezone.utc))[1] == "Christmas aur New Year party ke liye"
+    assert captions.occasion(datetime(2027, 1, 15, 9, 0, tzinfo=timezone.utc))[1] == "Lohri aur Sankranti ke liye"
+    assert captions.occasion(datetime(2027, 3, 22, 9, 0, tzinfo=timezone.utc))[1] == "Holi ke liye"
+    assert captions.occasion(datetime(2027, 3, 25, 9, 0, tzinfo=timezone.utc)) is None  # no shaadi muhurats, no festival
+    assert captions.occasion(datetime(2027, 5, 1, 9, 0, tzinfo=timezone.utc)) is None
+    # in order and never overlapping, so one day can only ever match one line
+    spans = [(first, last) for first, last, _, _ in captions.OCCASIONS]
+    assert all(first <= last for first, last in spans) and all(a[1] < b[0] for a, b in zip(spans, spans[1:]))
     d = deal(checked_at=diwali - timedelta(hours=1))
     for fn in (captions.telegram, captions.facebook, captions.instagram, captions.threads):
         text = fn(d, diwali)
@@ -770,3 +823,46 @@ def test_pinterest_host_is_only_ever_pinterest():
     assert pinterest.api_base({}) == "https://api.pinterest.com/v5"
     assert pinterest.api_base({"PINTEREST_SANDBOX": "1"}) == "https://api-sandbox.pinterest.com/v5"
     assert pinterest.api_base({"PINTEREST_SANDBOX": "https://evil.example/v5"}) == "https://api.pinterest.com/v5"
+
+
+def sitemap_file(path, *urls):
+    locs = "".join(f"<url><loc>{u}</loc></url>" for u in urls)
+    path.write_text(f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{locs}</urlset>', encoding="utf-8")
+    return str(path)
+
+
+def test_indexnow_sends_only_pages_new_in_this_deploy(tmp_path, monkeypatch):
+    sent = []
+    monkeypatch.setattr(indexnow, "call", lambda method, url, **kw: sent.append((method, url, kw["json"])))
+    base = indexnow.SITE_URL
+    old = sitemap_file(tmp_path / "old.xml", base, f"{base}d/a.html")
+    new = sitemap_file(tmp_path / "new.xml", base, f"{base}d/a.html", f"{base}d/b.html")
+    assert indexnow.main([old, new]) == 0
+    assert sent == [("POST", indexnow.ENDPOINT, {"host": "artipathakjha.github.io", "key": indexnow.KEY,
+                                                 "keyLocation": f"{base}{indexnow.KEY}.txt",
+                                                 "urlList": [f"{base}d/b.html"]})]
+
+
+def test_indexnow_sends_nothing_when_no_page_is_new(tmp_path, monkeypatch):
+    monkeypatch.setattr(indexnow, "call", lambda *a, **k: pytest.fail("nothing to send"))
+    same = sitemap_file(tmp_path / "s.xml", indexnow.SITE_URL)
+    assert indexnow.main([same, same]) == 0
+
+
+def test_indexnow_never_resends_everything_when_the_old_sitemap_is_unreadable(tmp_path, monkeypatch):
+    monkeypatch.setattr(indexnow, "call", lambda *a, **k: pytest.fail("must not send"))
+    new = sitemap_file(tmp_path / "new.xml", indexnow.SITE_URL)
+    with pytest.raises(FileNotFoundError):
+        indexnow.main([str(tmp_path / "missing.xml"), new])
+    (tmp_path / "bad.xml").write_text("<html>rate limited", encoding="utf-8")
+    with pytest.raises(ET.ParseError):
+        indexnow.main([str(tmp_path / "bad.xml"), new])
+
+
+def test_site_serves_the_indexnow_key_file(tmp_path, monkeypatch):
+    from tb import site
+    monkeypatch.setattr(site, "load_deals", lambda p: [deal(id="myntra-1")])
+    monkeypatch.setattr(site, "load_state", lambda p: {})
+    assert site.main([str(tmp_path)]) == 0
+    assert (tmp_path / f"{indexnow.KEY}.txt").read_text(encoding="utf-8") == indexnow.KEY
+    assert 8 <= len(indexnow.KEY) <= 128 and indexnow.KEY.isalnum()
