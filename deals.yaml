@@ -38,7 +38,6 @@
   - myntra
   - trendybehna
 - id: myntra-32145448
-  featured: true  # Arti Reel 1 "Diwali look" (2026-11-01); move the flag to the next Reel's deals
   store: myntra
   title: MOKOSH Silk Embroidered Anarkali Kurta, Pant & Dupatta Set
   category: Kurta Set
@@ -138,7 +137,6 @@
   - myntra
   - trendybehna
 - id: myntra-9587371
-  featured: true  # Arti Reel 1 "Diwali look" (2026-11-01)
   store: myntra
   title: Rubans Gold-Plated Kundan Layered Jhumka Earrings
   category: Earrings
@@ -412,6 +410,23 @@
   - bags
   - myntra
   - trendybehna
+- id: myntra-21932486
+  store: myntra
+  title: Satrani Woven Design Banarasi Saree
+  category: Saree
+  blurb: Woven design wali Banarasi saree, shaadi season ke liye.
+  url: https://myntr.it/8PhKCba
+  price: 1458
+  mrp: 9612
+  rating: 4.1
+  ratings_count: 4600
+  checked_at: 2026-11-07 01:20:00+00:00
+  featured: true  # Arti Reel 2 "Shaadi look" (2026-11-07); move the flag to the next Reel's deals
+  tags:
+  - saree
+  - banarasi
+  - myntra
+  - trendybehna
 - id: myntra-31430396
   store: myntra
   title: Rubans Gold-Plated Ruby & Kundan Necklace Set with Jhumkas
@@ -444,6 +459,23 @@
   - party
   - amazon
   - trendybehna
+- id: myntra-29553974
+  store: myntra
+  title: Rubans 22KT Gold-Plated Maang Tikka
+  category: Maang Tikka
+  blurb: 22KT gold-plated maang tikka, shaadi ke look ke liye.
+  url: https://myntr.it/6YJKjXu
+  price: 417
+  mrp: 1600
+  rating: 4.6
+  ratings_count: 3100
+  checked_at: 2026-11-07 01:20:00+00:00
+  featured: true  # Arti Reel 2 "Shaadi look" (2026-11-07); move the flag to the next Reel's deals
+  tags:
+  - maangtikka
+  - jewellery
+  - myntra
+  - trendybehna
 - id: amazon-B0FRFXX2C3
   store: amazon
   title: KLOSIA Rayon Printed Anarkali Kurta, Pant & Dupatta Set
@@ -473,6 +505,22 @@
   - kurtaset
   - sangria
   - diwali
+  - myntra
+  - trendybehna
+- id: myntra-35824602
+  store: myntra
+  title: NEEL ART Semi-Stitched Lehenga with Unstitched Blouse & Dupatta
+  category: Lehenga
+  blurb: Semi-stitched lehenga, unstitched blouse aur dupatta ke saath.
+  url: https://myntr.it/duAvUUX
+  price: 1799
+  mrp: 6999
+  rating: 4.6
+  ratings_count: 360
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - lehenga
+  - shaadilook
   - myntra
   - trendybehna
 - id: myntra-24947008
@@ -505,6 +553,22 @@
   - watch
   - womenswatch
   - amazon
+  - trendybehna
+- id: myntra-17550846
+  store: myntra
+  title: Saraf RS Jewellery Rose Gold-Plated AD-Studded Jewellery Set
+  category: Jewellery
+  blurb: Rose gold-plated jewellery set, AD stones ke saath.
+  url: https://myntr.it/q5Ua6cd
+  price: 1008
+  mrp: 6300
+  rating: 4.4
+  ratings_count: 6300
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - jewellery
+  - shaadilook
+  - myntra
   - trendybehna
 - id: myntra-38459602
   store: myntra
@@ -540,6 +604,20 @@
   - jewellery
   - myntra
   - trendybehna
+- id: amazon-B07Q538CC5
+  store: amazon
+  title: Zaveri Pearls Ethnic Kundan & Pearls Multi Layers Bridal Necklace Set
+  category: Jewellery
+  blurb: Kundan aur pearls wala multi-layer bridal necklace set.
+  url: https://www.amazon.in/dp/B07Q538CC5?tag=trendybehna-21
+  rating: 4.0
+  ratings_count: 2246
+  checked_at: 2026-11-07 02:06:00+00:00
+  tags:
+  - jewellery
+  - shaadilook
+  - amazon
+  - trendybehna
 - id: myntra-15528408
   store: myntra
   title: Mochi Gold-Toned Embellished T-Strap Wedges
@@ -572,6 +650,22 @@
   - jhumka
   - myntra
   - trendybehna
+- id: myntra-36790668
+  store: myntra
+  title: PLANX Embroidered Potli Clutch
+  category: Clutch
+  blurb: Embroidered potli clutch, ethnic look ke saath.
+  url: https://myntr.it/x3SK9r5
+  price: 734
+  mrp: 2499
+  rating: 4.4
+  ratings_count: 1500
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - clutch
+  - potli
+  - myntra
+  - trendybehna
 - id: myntra-38863833
   store: myntra
   title: FIORRA Light Pink Embroidered Organza Kurta Set with Dupatta
@@ -601,6 +695,22 @@
   - handbag
   - bags
   - amazon
+  - trendybehna
+- id: myntra-28644120
+  store: myntra
+  title: Anouk Embroidered Mojaris
+  category: Footwear
+  blurb: Embroidered mojaris, ethnic outfit ke saath.
+  url: https://myntr.it/eVXcXkW
+  price: 532
+  mrp: 1999
+  rating: 4.4
+  ratings_count: 4300
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - footwear
+  - ethnicwear
+  - myntra
   - trendybehna
 - id: myntra-42744011
   store: myntra
@@ -632,6 +742,22 @@
   tags:
   - jewellery
   - choker
+  - myntra
+  - trendybehna
+- id: myntra-36653402
+  store: myntra
+  title: Sangria Ready to Wear Lehenga
+  category: Lehenga
+  blurb: Ready to wear lehenga, shaadi ke functions ke liye.
+  url: https://myntr.it/cuydVye
+  price: 1753
+  mrp: 9299
+  rating: 4.1
+  ratings_count: 628
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - lehenga
+  - shaadilook
   - myntra
   - trendybehna
 - id: myntra-39622020
@@ -666,6 +792,22 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: myntra-28915384
+  store: myntra
+  title: Zaveri Pearls Gold-Plated Jewellery Set
+  category: Jewellery
+  blurb: Gold-plated jewellery set, ethnic look ke liye.
+  url: https://myntr.it/p6zSLjY
+  price: 576
+  mrp: 3950
+  rating: 4.2
+  ratings_count: 4500
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - jewellery
+  - shaadilook
+  - myntra
+  - trendybehna
 - id: myntra-45387053
   store: myntra
   title: Tankori Embroidered Poly Crepe Saree
@@ -694,6 +836,22 @@
   tags:
   - earrings
   - amazon
+  - trendybehna
+- id: myntra-32938548
+  store: myntra
+  title: Moda Rapido Woven Design Banarasi Silk Blend Saree
+  category: Saree
+  blurb: Banarasi silk blend saree, woven design ke saath.
+  url: https://myntr.it/pWxN90B
+  price: 650
+  mrp: 2999
+  rating: 4.1
+  ratings_count: 1200
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - saree
+  - banarasi
+  - myntra
   - trendybehna
 - id: myntra-18316312
   store: myntra
@@ -727,6 +885,20 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: amazon-B01LXAAKFD
+  store: amazon
+  title: YouBella Antique Look Gold Plated Traditional Bracelet Bangles Set
+  category: Bangles
+  blurb: Antique look wala gold plated bangles set.
+  url: https://www.amazon.in/dp/B01LXAAKFD?tag=trendybehna-21
+  rating: 4.0
+  ratings_count: 1157
+  checked_at: 2026-11-07 02:06:00+00:00
+  tags:
+  - bangles
+  - jewellery
+  - amazon
+  - trendybehna
 - id: myntra-23641136
   store: myntra
   title: MIRAGGIO Colourblocked Bella Shoulder Bag with Detachable Strap
@@ -759,6 +931,22 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: myntra-31052175
+  store: myntra
+  title: Rubans Set of 2 Gold-Plated Bangles
+  category: Bangles
+  blurb: 2 gold-plated bangles ka set.
+  url: https://myntr.it/hy4o6KG
+  price: 400
+  mrp: 1375
+  rating: 4.3
+  ratings_count: 1600
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - bangles
+  - jewellery
+  - myntra
+  - trendybehna
 - id: myntra-33214436
   store: myntra
   title: Anouk Mirror Work Kurta with Palazzos & Dupatta
@@ -788,6 +976,22 @@
   - kurtaset
   - ethnicwear
   - amazon
+  - trendybehna
+- id: myntra-20216024
+  store: myntra
+  title: Lino Perros Embellished Potli Clutch
+  category: Clutch
+  blurb: Embellished potli clutch, party aur shaadi ke liye.
+  url: https://myntr.it/BQ74HfL
+  price: 1647
+  mrp: 2995
+  rating: 4.5
+  ratings_count: 3600
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - clutch
+  - potli
+  - myntra
   - trendybehna
 - id: myntra-33332622
   store: myntra
@@ -819,6 +1023,22 @@
   tags:
   - kurtaset
   - ethnicwear
+  - myntra
+  - trendybehna
+- id: myntra-12931562
+  store: myntra
+  title: Rubans 22K Gold-Plated Ruby & Stone-Studded Handcrafted Jewellery Set
+  category: Jewellery
+  blurb: Handcrafted 22K gold-plated set, ruby aur stone work ke saath.
+  url: https://myntr.it/tj25qgr
+  price: 1424
+  mrp: 8900
+  rating: 4.3
+  ratings_count: 3600
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - jewellery
+  - shaadilook
   - myntra
   - trendybehna
 - id: myntra-32737401
@@ -853,6 +1073,22 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: myntra-31758729
+  store: myntra
+  title: Shae by SASSAFRAS Ready to Wear Lehenga
+  category: Lehenga
+  blurb: Ready to wear lehenga, shaadi ke functions ke liye.
+  url: https://myntr.it/kb5CU4m
+  price: 2586
+  mrp: 6299
+  rating: 4.3
+  ratings_count: 320
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - lehenga
+  - shaadilook
+  - myntra
+  - trendybehna
 - id: myntra-38995747
   store: myntra
   title: FIORRA Embroidered Kurta with Sharara & Dupatta
@@ -885,6 +1121,21 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: myntra-27823840
+  store: myntra
+  title: Kushal's Fashion Jewellery Gold-Plated Maang Tikka
+  category: Maang Tikka
+  blurb: Gold-plated maang tikka, shaadi ke look ke liye.
+  url: https://myntr.it/fdnvJOa
+  price: 680
+  rating: 4.6
+  ratings_count: 614
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - maangtikka
+  - jewellery
+  - myntra
+  - trendybehna
 - id: myntra-36081124
   store: myntra
   title: colorkosh Floral Embroidered Kurta with Palazzos
@@ -899,5 +1150,99 @@
   tags:
   - kurtaset
   - ethnicwear
+  - myntra
+  - trendybehna
+- id: myntra-35769629
+  store: myntra
+  title: Sangria Saree with Unstitched Blouse
+  category: Saree
+  blurb: Saree, unstitched blouse piece ke saath.
+  url: https://myntr.it/rcK6vt4
+  price: 1969
+  mrp: 9399
+  rating: 4.3
+  ratings_count: 653
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - saree
+  - banarasi
+  - myntra
+  - trendybehna
+- id: amazon-B0B15GYNS4
+  store: amazon
+  title: Shining Diva Fashion Traditional Tibetan Pendant Necklace Jewellery Set
+  category: Jewellery
+  blurb: Traditional Tibetan pendant wala necklace jewellery set.
+  url: https://www.amazon.in/dp/B0B15GYNS4?tag=trendybehna-21
+  rating: 4.1
+  ratings_count: 1478
+  checked_at: 2026-11-07 02:06:00+00:00
+  tags:
+  - jewellery
+  - shaadilook
+  - amazon
+  - trendybehna
+- id: myntra-44518201
+  store: myntra
+  title: Anouk Embroidered Embellished Box Clutch
+  category: Clutch
+  blurb: Embroidered box clutch, embellished design ke saath.
+  url: https://myntr.it/y7aoDPg
+  price: 423
+  mrp: 1999
+  rating: 4.7
+  ratings_count: 750
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - clutch
+  - potli
+  - myntra
+  - trendybehna
+- id: myntra-37354211
+  store: myntra
+  title: PANASH Set of 2 Gold-Plated Bangles
+  category: Bangles
+  blurb: 2 gold-plated bangles ka set.
+  url: https://myntr.it/HOhSv41
+  price: 539
+  mrp: 2699
+  rating: 4.4
+  ratings_count: 673
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - bangles
+  - jewellery
+  - myntra
+  - trendybehna
+- id: myntra-30105785
+  store: myntra
+  title: House of Pataudi Embellished Wedges
+  category: Footwear
+  blurb: Embellished wedges, ethnic outfit ke saath.
+  url: https://myntr.it/joz2j0o
+  price: 1479
+  mrp: 3999
+  rating: 4.7
+  ratings_count: 534
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - footwear
+  - ethnicwear
+  - myntra
+  - trendybehna
+- id: myntra-7696403
+  store: myntra
+  title: Rubans Handcrafted Jewellery Set
+  category: Jewellery
+  blurb: Handcrafted jewellery set, ethnic look ke liye.
+  url: https://myntr.it/BsAHH4D
+  price: 882
+  mrp: 3836
+  rating: 4.4
+  ratings_count: 1700
+  checked_at: 2026-11-07 01:20:00+00:00
+  tags:
+  - jewellery
+  - shaadilook
   - myntra
   - trendybehna
