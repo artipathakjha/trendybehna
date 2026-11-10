@@ -72,12 +72,13 @@
  },
  "amazon-B0FRFXX2C3": {
   "_fail": {
-   "pinterest": 2
+   "pinterest": 3
   },
   "facebook": "2026-11-10T05:27:50+00:00 1358373194033893_122108574555530314",
   "facebook_reel": "2026-11-10T05:28:09+00:00 1502668411705781",
   "instagram": "2026-11-10T05:27:59+00:00 18134527555747994",
   "instagram_reel": "2026-11-10T05:28:37+00:00 18062650556565566",
+  "pinterest": "skipped 2026-11-10T09:29:57+00:00 HTTP 401: {'code': 3, 'message': \"Your token does not have sufficient permissions to perform this operation. Please ensure your token is authorized with the correct set of scopes. Missing: ['pins:read",
   "telegram": "2026-11-10T05:27:45+00:00 33",
   "threads": "2026-11-10T05:28:54+00:00 18105350546623677"
  },
