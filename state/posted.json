@@ -229,12 +229,13 @@
  },
  "myntra-28915384": {
   "_fail": {
-   "pinterest": 2
+   "pinterest": 3
   },
   "facebook": "2026-11-22T05:29:24+00:00 1358373194033893_122113159839530314",
   "facebook_reel": "2026-11-22T05:29:44+00:00 1135313596065218",
   "instagram": "2026-11-22T05:29:37+00:00 17993224758119603",
   "instagram_reel": "2026-11-22T05:30:16+00:00 18140541697636030",
+  "pinterest": "skipped 2026-11-22T09:25:31+00:00 HTTP 401: {'code': 3, 'message': \"Your token does not have sufficient permissions to perform this operation. Please ensure your token is authorized with the correct set of scopes. Missing: ['pins:read",
   "telegram": "2026-11-22T05:29:21+00:00 53",
   "threads": "2026-11-22T05:30:30+00:00 17999735070020898"
  },
