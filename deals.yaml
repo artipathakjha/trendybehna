@@ -993,6 +993,20 @@
   - potli
   - myntra
   - trendybehna
+- id: amazon-B01DGC2Y8Y
+  store: amazon
+  title: Kani Poly Wool Shawl for Women
+  category: Shawl
+  blurb: Kani design wali poly wool shawl, sardi ke liye.
+  url: https://www.amazon.in/dp/B01DGC2Y8Y?tag=trendybehna-21
+  rating: 4.0
+  ratings_count: 1586
+  checked_at: 2026-11-28 06:30:00+00:00
+  tags:
+  - shawl
+  - winterwear
+  - amazon
+  - trendybehna
 - id: myntra-45820621
   store: myntra
   title: Anouk Maroon Velvet Farshi Salwar
@@ -1024,6 +1038,20 @@
   - saree
   - ethnicwear
   - myntra
+  - trendybehna
+- id: amazon-B07RCYYF2P
+  store: amazon
+  title: Karatcart Gold Plated Kundan Tassel Earrings
+  category: Earrings
+  blurb: Gold plated kundan tassel earrings, ethnic look ke liye.
+  url: https://www.amazon.in/dp/B07RCYYF2P?tag=trendybehna-21
+  rating: 4.0
+  ratings_count: 2393
+  checked_at: 2026-11-28 06:30:00+00:00
+  tags:
+  - earrings
+  - jewellery
+  - amazon
   - trendybehna
 - id: myntra-41134965
   store: myntra
@@ -1057,6 +1085,20 @@
   - jewellery
   - myntra
   - trendybehna
+- id: amazon-B09J2BRCNG
+  store: amazon
+  title: Pivl V Neck Casual Cardigan for Winter
+  category: Sweater
+  blurb: V neck cardigan, sardi ke liye.
+  url: https://www.amazon.in/dp/B09J2BRCNG?tag=trendybehna-21
+  rating: 4.0
+  ratings_count: 2537
+  checked_at: 2026-11-28 06:30:00+00:00
+  tags:
+  - sweater
+  - winterwear
+  - amazon
+  - trendybehna
 - id: myntra-12931562
   store: myntra
   title: Rubans 22K Gold-Plated Ruby & Stone-Studded Handcrafted Jewellery Set
@@ -1088,6 +1130,20 @@
   - kurtaset
   - ethnicwear
   - myntra
+  - trendybehna
+- id: amazon-B07YPZW9MJ
+  store: amazon
+  title: Women's Kashmiri Woolen Shawl with Jacquard Palla
+  category: Shawl
+  blurb: Jacquard palla wali woolen shawl.
+  url: https://www.amazon.in/dp/B07YPZW9MJ?tag=trendybehna-21
+  rating: 4.0
+  ratings_count: 1366
+  checked_at: 2026-11-28 06:30:00+00:00
+  tags:
+  - shawl
+  - winterwear
+  - amazon
   - trendybehna
 - id: myntra-15874802
   store: myntra
@@ -1121,6 +1177,20 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: amazon-B07L92XRZC
+  store: amazon
+  title: Gold Plated Long Hair Chain Earrings
+  category: Earrings
+  blurb: Gold plated hair chain earrings, shaadi ke look ke liye.
+  url: https://www.amazon.in/dp/B07L92XRZC?tag=trendybehna-21
+  rating: 4.1
+  ratings_count: 1402
+  checked_at: 2026-11-28 06:30:00+00:00
+  tags:
+  - earrings
+  - jewellery
+  - amazon
+  - trendybehna
 - id: myntra-31758729
   store: myntra
   title: Shae by SASSAFRAS Ready to Wear Lehenga
@@ -1152,6 +1222,20 @@
   - saree
   - shaadilook
   - myntra
+  - trendybehna
+- id: amazon-B0B5WYCZ9V
+  store: amazon
+  title: Women's Woolen Cable Design Cardigan Sweater
+  category: Sweater
+  blurb: Cable design wala woolen cardigan, sardi ke liye.
+  url: https://www.amazon.in/dp/B0B5WYCZ9V?tag=trendybehna-21
+  rating: 4.2
+  ratings_count: 1174
+  checked_at: 2026-11-28 06:30:00+00:00
+  tags:
+  - sweater
+  - winterwear
+  - amazon
   - trendybehna
 - id: myntra-38995747
   store: myntra
