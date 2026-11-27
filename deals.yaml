@@ -993,6 +993,22 @@
   - potli
   - myntra
   - trendybehna
+- id: myntra-45820621
+  store: myntra
+  title: Anouk Maroon Velvet Farshi Salwar
+  category: Kurta Set
+  blurb: Maroon velvet farshi salwar, shaadi aur sardi dono ke liye.
+  url: https://myntr.it/Gm1urLF
+  price: 3662
+  mrp: 10599
+  rating: 4.6
+  ratings_count: 3000
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - kurtaset
+  - ethnicwear
+  - myntra
+  - trendybehna
 - id: myntra-33332622
   store: myntra
   title: Anouk Sequinned Tissue Designer Saree
@@ -1023,6 +1039,22 @@
   tags:
   - kurtaset
   - ethnicwear
+  - myntra
+  - trendybehna
+- id: myntra-36591135
+  store: myntra
+  title: KARATCART Drop Gold-Plated Kundan Earrings
+  category: Earrings
+  blurb: Gold-plated kundan drop earrings, ethnic look ke liye.
+  url: https://myntr.it/214IKBi
+  price: 779
+  mrp: 3596
+  rating: 4.2
+  ratings_count: 398
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - earrings
+  - jewellery
   - myntra
   - trendybehna
 - id: myntra-12931562
@@ -1057,6 +1089,22 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: myntra-15874802
+  store: myntra
+  title: Pashmoda Women Woven Design Shawl
+  category: Shawl
+  blurb: Woven design wali shawl, sardi ke liye.
+  url: https://myntr.it/mXxhH9R
+  price: 1148
+  mrp: 1565
+  rating: 4.6
+  ratings_count: 486
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - shawl
+  - winterwear
+  - myntra
+  - trendybehna
 - id: myntra-30881036
   store: myntra
   title: House of Pataudi Embroidered Saree with Blouse
@@ -1086,6 +1134,22 @@
   checked_at: 2026-11-07 01:20:00+00:00
   tags:
   - lehenga
+  - shaadilook
+  - myntra
+  - trendybehna
+- id: myntra-28931300
+  store: myntra
+  title: Satrani Woven Design Banarasi Saree
+  category: Saree
+  blurb: Woven design wali Banarasi saree, shaadi season ke liye.
+  url: https://myntr.it/b7CY9hS
+  price: 1810
+  mrp: 8573
+  rating: 4.0
+  ratings_count: 3000
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - saree
   - shaadilook
   - myntra
   - trendybehna
@@ -1121,6 +1185,22 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: myntra-36958957
+  store: myntra
+  title: Azira Women Anarkali Kurta & Dupatta
+  category: Kurta Set
+  blurb: Anarkali kurta, dupatta ke saath.
+  url: https://myntr.it/00FveD6
+  price: 1149
+  mrp: 4199
+  rating: 4.4
+  ratings_count: 1700
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - kurtaset
+  - ethnicwear
+  - myntra
+  - trendybehna
 - id: myntra-27823840
   store: myntra
   title: Kushal's Fashion Jewellery Gold-Plated Maang Tikka
@@ -1152,6 +1232,22 @@
   - ethnicwear
   - myntra
   - trendybehna
+- id: myntra-37651685
+  store: myntra
+  title: Sangria Women Woven Design Shawl
+  category: Shawl
+  blurb: Woven design wali shawl, sardi ke liye.
+  url: https://myntr.it/rWayj7V
+  price: 1382
+  mrp: 4399
+  rating: 4.3
+  ratings_count: 2000
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - shawl
+  - winterwear
+  - myntra
+  - trendybehna
 - id: myntra-35769629
   store: myntra
   title: Sangria Saree with Unstitched Blouse
@@ -1181,6 +1277,22 @@
   - jewellery
   - shaadilook
   - amazon
+  - trendybehna
+- id: myntra-31241834
+  store: myntra
+  title: KALINI Anarkali Kurta & Dupatta
+  category: Kurta Set
+  blurb: Anarkali kurta, dupatta ke saath.
+  url: https://myntr.it/on7EhnO
+  price: 1941
+  mrp: 7999
+  rating: 4.1
+  ratings_count: 1600
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - kurtaset
+  - ethnicwear
+  - myntra
   - trendybehna
 - id: myntra-44518201
   store: myntra
@@ -1214,6 +1326,22 @@
   - jewellery
   - myntra
   - trendybehna
+- id: myntra-23979928
+  store: myntra
+  title: PALMONAS 18k Gold Plated Hoop Earrings
+  category: Earrings
+  blurb: 18k gold plated hoop earrings, roz ke look ke liye.
+  url: https://myntr.it/6nw9Jmf
+  price: 1040
+  mrp: 4334
+  rating: 4.4
+  ratings_count: 2400
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - earrings
+  - jewellery
+  - myntra
+  - trendybehna
 - id: myntra-30105785
   store: myntra
   title: House of Pataudi Embellished Wedges
@@ -1244,5 +1372,213 @@
   tags:
   - jewellery
   - shaadilook
+  - myntra
+  - trendybehna
+- id: myntra-30472381
+  store: myntra
+  title: Sangria Saree With Blouse Piece
+  category: Saree
+  blurb: Saree, blouse piece ke saath.
+  url: https://myntr.it/201VRC1
+  price: 688
+  mrp: 2496
+  rating: 4.0
+  ratings_count: 3800
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - saree
+  - shaadilook
+  - myntra
+  - trendybehna
+- id: myntra-41373201
+  store: myntra
+  title: Sangria Embroidered V-Neck Kurta Set
+  category: Kurta Set
+  blurb: Embroidered V-neck kurta set, ethnic look ke liye.
+  url: https://myntr.it/FomXrc4
+  price: 1959
+  mrp: 6629
+  rating: 4.4
+  ratings_count: 846
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - kurtaset
+  - ethnicwear
+  - myntra
+  - trendybehna
+- id: myntra-19798116
+  store: myntra
+  title: Roadster Women Cable Knit Pullover
+  category: Sweater
+  blurb: Cable knit pullover, sardi ke liye.
+  url: https://myntr.it/g137vs3
+  price: 635
+  mrp: 1899
+  rating: 4.4
+  ratings_count: 13300
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - sweater
+  - winterwear
+  - myntra
+  - trendybehna
+- id: myntra-32078497
+  store: myntra
+  title: EVERSTYLISH Sanjoya Embroidered Earrings
+  category: Earrings
+  blurb: Embroidered earrings, ethnic outfit ke saath.
+  url: https://myntr.it/yvfVze0
+  price: 663
+  mrp: 1799
+  rating: 4.3
+  ratings_count: 978
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - earrings
+  - jewellery
+  - myntra
+  - trendybehna
+- id: myntra-41814616
+  store: myntra
+  title: flipFabric Women Chevron Printed Anarkali Kurta
+  category: Kurta
+  blurb: Chevron print wala Anarkali kurta.
+  url: https://myntr.it/sB3MGlW
+  price: 857
+  mrp: 2999
+  rating: 4.5
+  ratings_count: 1900
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - anarkali
+  - ethnicwear
+  - myntra
+  - trendybehna
+- id: myntra-30890283
+  store: myntra
+  title: Pashmoda Woven Design Fringed Shawl
+  category: Shawl
+  blurb: Fringed shawl, woven design ke saath.
+  url: https://myntr.it/mP8U9ya
+  price: 809
+  mrp: 1425
+  rating: 4.4
+  ratings_count: 1500
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - shawl
+  - winterwear
+  - myntra
+  - trendybehna
+- id: myntra-31239812
+  store: myntra
+  title: KALINI Georgette Dress With Dupatta
+  category: Dress
+  blurb: Georgette dress, dupatta ke saath.
+  url: https://myntr.it/dzUszeP
+  price: 2879
+  mrp: 7999
+  rating: 4.1
+  ratings_count: 3400
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - dress
+  - partywear
+  - myntra
+  - trendybehna
+- id: myntra-43497498
+  store: myntra
+  title: Sangria Indie Florals Embroidered Co-Ords
+  category: Co-ord Set
+  blurb: Floral embroidered co-ord set.
+  url: https://myntr.it/bk1kkuB
+  price: 1728
+  mrp: 5599
+  rating: 4.1
+  ratings_count: 1500
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - coords
+  - partywear
+  - myntra
+  - trendybehna
+- id: myntra-11990860
+  store: myntra
+  title: Roadster Self Design Sweater
+  category: Sweater
+  blurb: Self design sweater, sardi ke liye.
+  url: https://myntr.it/9DPoopE
+  price: 747
+  mrp: 1699
+  rating: 4.2
+  ratings_count: 10000
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - sweater
+  - winterwear
+  - myntra
+  - trendybehna
+- id: myntra-39432312
+  store: myntra
+  title: Antheaa Chiffon Maxi Puff Sleeve Dress
+  category: Dress
+  blurb: Chiffon maxi dress, puff sleeves ke saath.
+  url: https://myntr.it/8g821gV
+  price: 1919
+  mrp: 3599
+  rating: 4.3
+  ratings_count: 661
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - dress
+  - partywear
+  - myntra
+  - trendybehna
+- id: myntra-37293499
+  store: myntra
+  title: Sangria Top Skirt & Shrug Co-Ords
+  category: Co-ord Set
+  blurb: Top, skirt aur shrug wala co-ord set.
+  url: https://myntr.it/q9Ww1wI
+  price: 1748
+  mrp: 5939
+  rating: 4.2
+  ratings_count: 1200
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - coords
+  - partywear
+  - myntra
+  - trendybehna
+- id: myntra-34434040
+  store: myntra
+  title: aayu Women Maxi Dress
+  category: Dress
+  blurb: Maxi dress, party aur outing ke liye.
+  url: https://myntr.it/DhN8w63
+  price: 680
+  mrp: 2999
+  rating: 4.5
+  ratings_count: 12100
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - dress
+  - partywear
+  - myntra
+  - trendybehna
+- id: myntra-43235349
+  store: myntra
+  title: AASK Rayon Printed Sleeveless Co-Ord Set
+  category: Co-ord Set
+  blurb: Printed rayon co-ord set, sleeveless.
+  url: https://myntr.it/G9zKn8t
+  price: 1961
+  mrp: 8799
+  rating: 4.3
+  ratings_count: 740
+  checked_at: 2026-11-27 05:00:00+00:00
+  tags:
+  - coords
+  - partywear
   - myntra
   - trendybehna
